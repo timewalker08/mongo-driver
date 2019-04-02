@@ -1,2 +1,6 @@
 *.egg-info
 =*
+.eggs
+*.pyc
+.vscode
+Pipfile.lock

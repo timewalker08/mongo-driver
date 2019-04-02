@@ -119,7 +119,6 @@ class ReadMixin(BaseMixin):
             yield last_doc
 
     @classmethod
-    @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
     def aggregate(cls, pipeline=None, slave_ok='offline'):
         # TODO max_time_ms: timeout control needed
         slave_ok = _get_slave_ok(slave_ok)

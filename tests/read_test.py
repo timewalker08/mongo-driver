@@ -55,7 +55,7 @@ class ReadTests(unittest.TestCase):
         for index, doc in enumerate(docs):
             self.assertEquals(doc.test_pk, limit - index - 11)
 
-        docs_iter = TestDoc.find_iter({}, batch_size=10, max_time_ms=100)
+        docs_iter = TestDoc.find_iter({}, batch_size=10, max_time_ms=200)
         for doc in docs_iter:
             self.assertEquals(doc.test_pk, doc.test_int)
 

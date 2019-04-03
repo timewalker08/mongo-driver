@@ -21,6 +21,7 @@ Document Definition
 =============
 **Document Definition** is very like to mongoengine. Still, little difference is between them.
 
+```python
     from iu_mongo.document import Document, EmbeddedDocument
     from iu_mongo.fields import *
 
@@ -39,7 +40,7 @@ Document Definition
         test_edoc = EmbeddedDocumentField('TestEDoc')
         test_dict = DictField()
         test_list_edoct = EmbeddedDocumentListField('TestEDoc')
-
+```
 Note that thare are two main difference between iu_mongo and mongoengine when defining a document
 
 1. `db_field` is never needed, iu_mongo will use the **field name** as the field name when saving documents into mongodb.
@@ -66,7 +67,7 @@ iu_mongo provide many collection-level operations as well as document-level oper
 - set, unset, inc, push, pull, add_to_set
   
 Also, iu_mongo support bulk-like operations, for example
-
+```python
     with TestDoc.bulk() as bulk_context:
         for i in range(10):
             TestDoc.bulk_update(bulk_context, {
@@ -76,7 +77,7 @@ Also, iu_mongo support bulk-like operations, for example
                     'test_int': 1000
                 }
             }, multi=False)
-
+```
 
 supported bulk operations are
 - bulk_save

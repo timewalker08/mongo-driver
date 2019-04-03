@@ -8,7 +8,10 @@ from iu_mongo.errors import ValidationError
 from iu_mongo.timer import log_slow_event
 from iu_mongo.connection import ConnectionError
 
-RETRY_ERRORS = (pymongo.errors.PyMongoError, ConnectionError)
+RETRY_ERRORS = (
+    pymongo.errors.ConnectionFailure,
+    ConnectionError
+)
 RETRY_LOGGER = logging.getLogger('iu_mongo.pymongo_retry')
 
 
@@ -38,7 +41,7 @@ class BaseMixin(object):
         return key
 
     @classmethod
-    def _pymongo(cls, use_async=True, read_preference=None, write_concern=None):
+    def _pymongo(cls, read_preference=None, write_concern=None):
         from iu_mongo.connection import _get_db
         database = None
         collection = None
@@ -54,6 +57,8 @@ class BaseMixin(object):
 
     @classmethod
     def _update_filter(cls, filter):
+        if not isinstance(filter, dict):
+            return filter
         # handle queries with inheritance
         if cls._meta.get('allow_inheritance'):
             filter['_types'] = cls._class_name

@@ -15,28 +15,31 @@ class ReadMixin(BaseMixin):
     FIND_WARNING_DOCS_LIMIT = 10000
 
     @classmethod
-    def _count(cls, slave_ok=False, filter=None, hint=None, limit=0,
+    def _count(cls, slave_ok=False, filter={}, hint=None, limit=None,
                skip=0, max_time_ms=None):
+        filter = cls._update_filter(filter)
         slave_ok = _get_slave_ok(slave_ok)
         pymongo_collection = cls._pymongo(read_preference=slave_ok.read_pref)
         max_time_ms = max_time_ms or cls.MAX_TIME_MS
         cls._check_read_max_time_ms(
-            'count', max_time_ms, pymongo_collection.read_preference)
-        with log_slow_event('find', cls._meta['collection'], filter):
+            'count_documents', max_time_ms, pymongo_collection.read_preference)
+        with log_slow_event('count_documents', cls._meta['collection'], filter):
             kwargs_dict = {
-                'filter': filter,
                 'skip': skip,
-                'limit': limit,
             }
             if hint:
                 kwargs_dict.update({
                     'hint': hint
                 })
+            if limit > 0:
+                kwargs_dict.update({
+                    'limit': limit
+                })
             if max_time_ms > 0:
                 kwargs_dict.update({
                     'maxTimeMS': max_time_ms
                 })
-            return pymongo_collection.count(**kwargs_dict)
+            return pymongo_collection.count_documents(filter, **kwargs_dict)
 
     @classmethod
     def _find_raw(cls, filter, projection=None, skip=0, limit=0, sort=None,
@@ -150,7 +153,7 @@ class ReadMixin(BaseMixin):
 
     @classmethod
     @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
-    def count(cls, filter=None, slave_ok=False, max_time_ms=None,
+    def count(cls, filter={}, slave_ok=False, max_time_ms=None,
               skip=0, limit=0, hint=None):
         return cls._count(filter=filter, slave_ok=slave_ok,
                           max_time_ms=max_time_ms,

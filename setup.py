@@ -42,9 +42,7 @@ setup(
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     platforms=['any'],
-    test_suite='tests',
     license='MIT',
     install_requires=["pymongo>=3.7", "six", "retry"],
-    tests_require=['tornado', 'gevent'],
     **extra_opts
 )

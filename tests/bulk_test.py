@@ -1,15 +1,17 @@
 import unittest
-
 from tests.model.testdoc import TestDoc
 from iu_mongo.connection import connect
 
 
 class BulkTests(unittest.TestCase):
     def setUp(self):
-        connect(db_names=['test'])
+        try:
+            connect(db_names=['test'])
+        except ConnectionError:
+            self.skipTest('Mongo service is not started localhost')
 
     def _clear(self):
-        TestDoc.remove({'test_pk': {'$gt': -1}})
+        TestDoc.remove({})
 
     def _feed_data(self, limit, exception=False):
         with TestDoc.bulk() as bulk_context:
@@ -61,7 +63,7 @@ class BulkTests(unittest.TestCase):
                         'test_int': 1000
                     }
                 }, multi=False)
-        self.assertEquals(TestDoc.count({'test_int': 1000}), limit // 10)
+        self.assertEqual(TestDoc.count({'test_int': 1000}), limit // 10)
 
     def test_bulk_remove(self):
         limit = 100
@@ -72,7 +74,7 @@ class BulkTests(unittest.TestCase):
                 TestDoc.bulk_remove(bulk_context, {
                     'test_pk': {'$lt': 10 * (i + 1), '$gte': 10 * i}
                 }, multi=False)
-        self.assertEquals(TestDoc.count({}), limit - limit // 10)
+        self.assertEqual(TestDoc.count({}), limit - limit // 10)
 
     def test_bulk_update_one(self):
         self._clear()
@@ -109,14 +111,10 @@ class BulkTests(unittest.TestCase):
                 count5 += 1
             elif doc.test_pk * doc.test_pk in doc.test_list:
                 count6 += 1
-        self.assertEquals(count1, 10)
-        self.assertEquals(count2, 10)
-        self.assertEquals(count3, 10)
-        self.assertEquals(count4, 10)
-        self.assertEquals(count5, 10)
-        self.assertEquals(count6, 50)
+        self.assertEqual(count1, 10)
+        self.assertEqual(count2, 10)
+        self.assertEqual(count3, 10)
+        self.assertEqual(count4, 10)
+        self.assertEqual(count5, 10)
+        self.assertEqual(count6, 50)
 
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(BulkTests)
-    unittest.TextTestRunner(verbosity=2).run(suite)

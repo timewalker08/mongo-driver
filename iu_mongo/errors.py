@@ -53,6 +53,16 @@ class FieldDoesNotExist(IUMongoError):
     pass
 
 
+class ConnectionError(IUMongoError):
+    pass
+
+
+class BulkOperationError(OperationError):
+    def __init__(self, pymongo_bulk_write_error):
+        self._pymongo_error = pymongo_bulk_write_error
+        super(BulkOperationError, self).__init__('Bulk Write Error')
+
+
 class ValidationError(AssertionError):
     """Validation exception.
 

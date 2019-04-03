@@ -1,7 +1,5 @@
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
-#from mongoengine import Document, EmbeddedDocument
-#from mongoengine.fields import *
 
 class TestEDoc(EmbeddedDocument):
     test_int = IntField()

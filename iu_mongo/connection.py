@@ -1,5 +1,6 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.read_preferences import ReadPreference
+from iu_mongo.errors import ConnectionError
 import collections
 
 __all__ = ['connect', '_get_db']
@@ -18,8 +19,6 @@ _slave_ok_settings = {
 }
 
 
-class ConnectionError(Exception):
-    pass
 
 
 def _get_db(db_name):

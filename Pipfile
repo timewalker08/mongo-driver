@@ -10,4 +10,8 @@ python_version = "3.7"
 iu-mongo = {editable = true,path = "."}
 
 [scripts]
-test = "python setup.py test"
+test_all = "python -Wd -m unittest -v tests"
+test_single = "python -Wd -m unittest -v"
+
+[dev-packages]
+autopep8 = "*"

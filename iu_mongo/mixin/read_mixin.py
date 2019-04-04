@@ -3,10 +3,11 @@ import traceback
 import pymongo
 import time
 from retry import retry
+from bson import ObjectId
 from pymongo.read_preferences import ReadPreference
 from iu_mongo.mixin.base import BaseMixin, RETRY_ERRORS,\
     RETRY_LOGGER
-from iu_mongo.connection import _get_slave_ok
+from iu_mongo.base import SlaveOkSetting
 from iu_mongo.timer import log_slow_event
 
 
@@ -15,11 +16,11 @@ class ReadMixin(BaseMixin):
     FIND_WARNING_DOCS_LIMIT = 10000
 
     @classmethod
-    def _count(cls, slave_ok=False, filter={}, hint=None, limit=None,
-               skip=0, max_time_ms=None):
+    def _count(cls, slave_ok=SlaveOkSetting.PRIMARY, filter={},
+               hint=None, limit=None, skip=0, max_time_ms=None):
         filter = cls._update_filter(filter)
-        slave_ok = _get_slave_ok(slave_ok)
-        pymongo_collection = cls._pymongo(read_preference=slave_ok.read_pref)
+        read_preference = SlaveOkSetting.TO_PYMONGO[slave_ok]
+        pymongo_collection = cls._pymongo(read_preference=read_preference)
         max_time_ms = max_time_ms or cls.MAX_TIME_MS
         cls._check_read_max_time_ms(
             'count_documents', max_time_ms, pymongo_collection.read_preference)
@@ -43,27 +44,16 @@ class ReadMixin(BaseMixin):
 
     @classmethod
     def _find_raw(cls, filter, projection=None, skip=0, limit=0, sort=None,
-                  slave_ok=False, find_one=False, hint=None,
+                  slave_ok=SlaveOkSetting.PRIMARY, find_one=False, hint=None,
                   batch_size=10000, max_time_ms=None):
         # transform query
         filter = cls._update_filter(filter)
 
-        # transform sort
-        if sort:
-            new_sort = []
-            for f, dir in sort:
-                new_sort.append((f, dir))
-            sort = new_sort
-
-        # grab read preference & tags from slave_ok value
-        try:
-            slave_ok = _get_slave_ok(slave_ok)
-        except KeyError:
-            raise ValueError("Invalid slave_ok preference: %s" % slave_ok)
+        read_preference = SlaveOkSetting.TO_PYMONGO[slave_ok]
 
         with log_slow_event('find', cls._meta['collection'], filter):
             pymongo_collection = cls._pymongo(
-                read_preference=slave_ok.read_pref)
+                read_preference=read_preference)
             cur = pymongo_collection.find(filter, projection,
                                           skip=skip, limit=limit,
                                           sort=sort)
@@ -90,7 +80,7 @@ class ReadMixin(BaseMixin):
     @classmethod
     @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
     def find(cls, filter, projection=None, skip=0, limit=0, sort=None,
-             slave_ok=False, max_time_ms=None):
+             slave_ok=SlaveOkSetting.PRIMARY, max_time_ms=None):
         cur = cls._find_raw(filter, projection=projection, skip=skip,
                             limit=limit, sort=sort,
                             slave_ok=slave_ok,
@@ -111,7 +101,7 @@ class ReadMixin(BaseMixin):
 
     @classmethod
     def find_iter(cls, filter, projection=None, skip=0, limit=0, sort=None,
-                  slave_ok=False, batch_size=10000, max_time_ms=None):
+                  slave_ok=SlaveOkSetting.PRIMARY, batch_size=10000, max_time_ms=None):
         cur = cls._find_raw(filter, projection=projection, skip=skip,
                             limit=limit, sort=sort, slave_ok=slave_ok,
                             batch_size=batch_size,
@@ -122,10 +112,10 @@ class ReadMixin(BaseMixin):
             yield last_doc
 
     @classmethod
-    def aggregate(cls, pipeline=None, slave_ok='offline'):
+    def aggregate(cls, pipeline=None, slave_ok=SlaveOkSetting.OFFLINE):
         # TODO max_time_ms: timeout control needed
-        slave_ok = _get_slave_ok(slave_ok)
-        pymongo_collection = cls._pymongo(read_preference=slave_ok.read_pref)
+        read_preference = SlaveOkSetting.TO_PYMONGO[slave_ok]
+        pymongo_collection = cls._pymongo(read_preference=read_preference)
         cursor_iter = pymongo_collection.aggregate(pipeline)
         for doc in cursor_iter:
             yield cls._from_son(doc)
@@ -133,7 +123,7 @@ class ReadMixin(BaseMixin):
     @classmethod
     @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
     def distinct(cls, filter, key, skip=0, limit=0, sort=None,
-                 slave_ok=False, max_time_ms=None):
+                 slave_ok=SlaveOkSetting.PRIMARY, max_time_ms=None):
         cur = cls._find_raw(filter, skip=skip, limit=limit,
                             sort=sort, slave_ok=slave_ok,
                             max_time_ms=max_time_ms)
@@ -141,7 +131,7 @@ class ReadMixin(BaseMixin):
 
     @classmethod
     @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
-    def find_one(cls, filter, projection=None, sort=None, slave_ok=False,
+    def find_one(cls, filter, projection=None, sort=None, slave_ok=SlaveOkSetting.PRIMARY,
                  max_time_ms=None):
         doc = cls._find_raw(filter, projection=projection, sort=sort,
                             slave_ok=slave_ok, find_one=True,
@@ -153,7 +143,7 @@ class ReadMixin(BaseMixin):
 
     @classmethod
     @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
-    def count(cls, filter={}, slave_ok=False, max_time_ms=None,
+    def count(cls, filter={}, slave_ok=SlaveOkSetting.PRIMARY, max_time_ms=None,
               skip=0, limit=0, hint=None):
         return cls._count(filter=filter, slave_ok=slave_ok,
                           max_time_ms=max_time_ms,
@@ -161,8 +151,21 @@ class ReadMixin(BaseMixin):
                           skip=skip, limit=limit)
 
     @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
-    def reload(self, slave_ok=False):
+    def reload(self, slave_ok=SlaveOkSetting.PRIMARY):
         obj = self.__class__.find_one(self._by_id_key(self.id),
                                       slave_ok=slave_ok)
         for field in self._fields:
             setattr(self, field, obj[field])
+
+    @classmethod
+    @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
+    def by_id(cls, doc_id, **kwargs):
+        if isinstance(doc_id, str):
+            doc_id = ObjectId(doc_id)
+        return cls.find_one(cls._by_id_key(doc_id), **kwargs)
+
+    @classmethod
+    @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)
+    def by_ids(cls, doc_ids, **kwargs):
+        new_doc_ids = [ObjectId(doc_id) for doc_id in doc_ids]
+        return cls.find(cls._by_ids_key(new_doc_ids), **kwargs)

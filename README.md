@@ -17,6 +17,13 @@ just install iu_mongo as a VCS pip package installation in editable mode
 
     pip install -e git+git://github.com/intelligenceunion/mongo-driver.git
 
+Connect to mongodb
+=======
+```python
+from iu_mongo import connect
+connect(host="MONGODB_HOST",db_names=["DB_NAME"])
+```
+
 Document Definition
 =============
 **Document Definition** is very like to mongoengine. Still, little difference is between them.
@@ -65,6 +72,7 @@ iu_mongo provide many collection-level operations as well as document-level oper
 - delete
 - update_one
 - set, unset, inc, push, pull, add_to_set
+- by_id, by_ids
   
 Also, iu_mongo support bulk-like operations, for example
 ```python

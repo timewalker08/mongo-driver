@@ -7,6 +7,7 @@ from pymongo.write_concern import WriteConcern
 from pymongo.errors import ConnectionFailure
 from tests.model.testdoc import TestDoc
 from iu_mongo.connection import connect, clear_all
+from iu_mongo.base import SlaveOkSetting
 
 
 class ReadTests(unittest.TestCase):
@@ -101,9 +102,7 @@ class ReadTests(unittest.TestCase):
     def test_read_preference(self):
         self._clear()
         self._feed_data(100)
-        TestDoc.find({}, slave_ok='offline')
-        TestDoc.find({}, slave_ok=True)
-        TestDoc.find({}, slave_ok=False)
+        TestDoc.find({}, slave_ok=SlaveOkSetting.OFFLINE)
 
     def test_count(self):
         self._clear()
@@ -118,7 +117,7 @@ class ReadTests(unittest.TestCase):
         # TestDoc.count({'test_int': {'$lt': 10}}, max_time_ms=20000)
         # That's OK
         TestDoc.count({'test_int': {'$lt': 10}},
-                      max_time_ms=-1, slave_ok='offline')
+                      max_time_ms=-1, slave_ok=SlaveOkSetting.OFFLINE)
         doc = TestDoc.find_one({})
         self.assertEqual(TestDoc.count({'id': doc.id}), 1)
 
@@ -138,3 +137,25 @@ class ReadTests(unittest.TestCase):
         end = time.time()
         time2 = end-start
         self.assertLess(time2, time1)
+
+    def test_by_id(self):
+        self._clear()
+        self._feed_data(100)
+        doc = TestDoc.find_one({'test_pk': 10})
+        doc_id = doc.id
+        new_doc = TestDoc.by_id(doc_id)
+        self.assertEqual(new_doc.id, doc.id)
+        new_doc = TestDoc.by_id(str(doc_id))
+        self.assertEqual(new_doc.id, doc.id)
+
+    def test_by_ids(self):
+        self._clear()
+        self._feed_data(10)
+        docs = TestDoc.find({})
+        doc_ids = [doc.id for doc in docs]
+        doc_ids = doc_ids*2
+        doc_ids_str = [str(x) for x in doc_ids]
+        new_docs = TestDoc.by_ids(doc_ids)
+        self.assertEqual(len(new_docs), 10)
+        new_docs = TestDoc.by_ids(doc_ids_str)
+        self.assertEqual(len(new_docs), 10)

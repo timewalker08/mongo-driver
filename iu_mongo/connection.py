@@ -5,20 +5,9 @@ import collections
 
 __all__ = ['connect', '_get_db']
 
-SlaveOkSettings = collections.namedtuple('SlaveOkSettings',
-                                         ['read_pref', 'tags'])
-
 _connections = {}
 _dbs = {}
 _db_to_conn = {}
-_default_db = 'iu'
-_slave_ok_settings = {
-    False: SlaveOkSettings(ReadPreference.PRIMARY, [{}]),
-    True: SlaveOkSettings(ReadPreference.PRIMARY, [{}]),
-    'offline': SlaveOkSettings(ReadPreference.SECONDARY, [{}])
-}
-
-
 
 
 def _get_db(db_name):
@@ -30,10 +19,6 @@ def _get_db(db_name):
     return _dbs[db_name]
 
 
-def _get_slave_ok(slave_ok):
-    return _slave_ok_settings[slave_ok]
-
-
 def clear_all():
     global _connections, _dbs, _db_to_conn
     _connections = {}
@@ -42,9 +27,9 @@ def clear_all():
 
 
 def connect(host='localhost', conn_name='main', db_names=[],
-            slave_ok_settings=None, port=27017, max_pool_size=None,
+            port=27017, max_pool_size=None,
             socketTimeoutMS=None, connectTimeoutMS=None, waitQueueTimeoutMS=None):
-    global _connections, _db_to_conn, _slave_ok_settings
+    global _connections, _db_to_conn
 
     mongo_client_kwargs = {
         'host': host,
@@ -73,8 +58,5 @@ def connect(host='localhost', conn_name='main', db_names=[],
         if db_names:
             for db in db_names:
                 _db_to_conn[db] = conn_name
-
-        if slave_ok_settings:
-            _slave_ok_settings = slave_ok_settings
 
     return _connections[conn_name]

@@ -205,7 +205,7 @@ class BaseDocument(object):
                 return self.__unicode__()
             else:
                 return six.text_type(self).encode('utf-8')
-        return six.text_type('%s object' % self.__class__.__name__)
+        return six.text_type('%s object(id=%s)' % (self.__class__.__name__, self.id))
 
     def __eq__(self, other):
         if isinstance(other, self.__class__) and hasattr(other, 'id') and other.id is not None:

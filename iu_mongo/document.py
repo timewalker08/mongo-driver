@@ -15,8 +15,8 @@ __all__ = ('Document', 'EmbeddedDocument')
 
 class EmbeddedDocument(six.with_metaclass(DocumentMetaclass, BaseDocument)):
     """A :class:`~Document` that isn't stored in its own
-    collection.  :class:`~EmbeddedDocument`\ s should be used as
-    fields on :class:`~Document`\ s through the
+    collection.  :class:`~EmbeddedDocument` should be used as
+    fields on :class:`~Document` through the
     :class:`~EmbeddedDocumentField` field type.
 
     A :class:`~EmbeddedDocument` subclass may be itself subclassed,

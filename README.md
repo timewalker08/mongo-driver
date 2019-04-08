@@ -98,6 +98,12 @@ supported bulk operations are
 - bulk_pull
 - bulk_add_to_set
 
+
+DBShell
+=====
+1. Run `pipenv run dbshell` to start up a dbshell
+2. For programming usage, refer to `DBShell` class under `utils/dbshell.py`
+
 Contribute guidelines
 =====
 1. Make sure you have [pipenv](https://pipenv.readthedocs.io/en/latest/) and python3 environment

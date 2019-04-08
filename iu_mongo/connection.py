@@ -3,7 +3,7 @@ from pymongo.read_preferences import ReadPreference
 from iu_mongo.errors import ConnectionError
 import collections
 
-__all__ = ['connect', '_get_db']
+__all__ = ['connect', '_get_db', 'clear_all']
 
 _connections = {}
 _dbs = {}

@@ -43,6 +43,6 @@ setup(
     long_description=LONG_DESCRIPTION,
     platforms=['any'],
     license='MIT',
-    install_requires=["pymongo>=3.7", "six", "retry"],
+    install_requires=["pymongo>=3.7", "six", "retry", "ipython>=7.4"],
     **extra_opts
 )

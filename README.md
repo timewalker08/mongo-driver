@@ -21,7 +21,7 @@ Connect to mongodb
 =======
 ```python
 from iu_mongo import connect
-connect(host="MONGODB_HOST",db_names=["DB_NAME"])
+connect(host="MONGODB_HOST",db_names=["DB_NAME"], username='username', password='password', auth_db='admin')
 ```
 
 Document Definition

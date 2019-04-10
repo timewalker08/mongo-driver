@@ -7,7 +7,7 @@ from pymongo.write_concern import WriteConcern
 from pymongo.errors import ConnectionFailure
 from tests.model.testdoc import TestDoc
 from iu_mongo.connection import connect, clear_all
-from iu_mongo.base import SlaveOkSetting
+from iu_mongo import SlaveOkSetting
 
 
 class ReadTests(unittest.TestCase):

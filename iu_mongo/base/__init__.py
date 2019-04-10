@@ -3,7 +3,6 @@ from iu_mongo.base.datastructures import *
 from iu_mongo.base.document import *
 from iu_mongo.base.fields import *
 from iu_mongo.base.metaclasses import *
-from iu_mongo.base.slave_ok_setting import *
 
 __all__ = (
     # common
@@ -20,7 +19,4 @@ __all__ = (
 
     # metaclasses
     'DocumentMetaclass', 'TopLevelDocumentMetaclass',
-
-    # slave ok settings
-    'SlaveOkSetting'
 )

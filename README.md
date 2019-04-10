@@ -104,6 +104,60 @@ DBShell
 1. Run `pipenv run dbshell` to start up a dbshell
 2. For programming usage, refer to `DBShell` class under `utils/dbshell.py`
 
+Index Definition/Manipulation
+=====
+- Index definition example
+```python
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
+from iu_mongo.index import IndexDefinition
+
+class TestDoc(Document):
+    meta = {
+        'db_name': 'test',
+        'indexes': [
+            IndexDefinition.parse_from_keys_str('test_int:1'),
+            IndexDefinition.parse_from_keys_str('test_pk:-1,test_int:1'),
+            IndexDefinition.parse_from_keys_str(
+                'test_int:1,test_list:1', unique=True),
+            IndexDefinition.parse_from_keys_str('test_pk:-1', unique=True),
+            IndexDefinition.parse_from_keys_str('test_dict:1', sparse=True),
+            IndexDefinition.parse_from_keys_str(
+                'test_list:1', expire_after_seconds=10),
+            IndexDefinition.parse_from_keys_str(
+                'test_pk:1,test_int:1', unique=True),
+        ]
+    }
+```
+- Index manipulation example
+```python
+In [1]: TestDoc.list_indexes()                                                                                                                                
+test_int_1               ()        DEFINED                       COVERED        
+_id_                     ()        DEFINED        BUILT                         
+test_list_1              (TTL)     DEFINED                                      
+test_pk_-1               (UNIQUE)  DEFINED                                      
+test_dict_1              (SPARSE)  DEFINED                                      
+test_pk_-1_test_int_1    ()        DEFINED                                      
+test_pk_1_test_int_1     (UNIQUE)  DEFINED                                      
+test_int_1_test_list_1   (UNIQUE)  DEFINED 
+
+In [2]: TestDoc.create_indexes()                                                                                                                              
+Will build index test_list_1_TTL, are you sure? (yes/no)yes
+Index built in background, please check that after a while
+Will build index test_pk_-1_UNIQUE, are you sure? (yes/no)yes
+Index built in background, please check that after a while
+Will build index test_dict_1_SPARSE, are you sure? (yes/no)yes
+Index built in background, please check that after a while
+Will build index test_pk_-1_test_int_1, are you sure? (yes/no)yes
+Index built in background, please check that after a while
+Will build index test_pk_1_test_int_1_UNIQUE, are you sure? (yes/no)yes
+Index built in background, please check that after a while
+Will build index test_int_1_test_list_1_UNIQUE, are you sure? (yes/no)yes
+Index built in background, please check that after a while
+
+In [13]: TestDoc.drop_index('test_pk_-1')
+```
+
 Contribute guidelines
 =====
 1. Make sure you have [pipenv](https://pipenv.readthedocs.io/en/latest/) and python3 environment

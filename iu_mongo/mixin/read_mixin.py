@@ -7,8 +7,8 @@ from bson import ObjectId
 from pymongo.read_preferences import ReadPreference
 from iu_mongo.mixin.base import BaseMixin, RETRY_ERRORS,\
     RETRY_LOGGER
-from iu_mongo.base import SlaveOkSetting
 from iu_mongo.timer import log_slow_event
+from iu_mongo import SlaveOkSetting
 
 
 class ReadMixin(BaseMixin):

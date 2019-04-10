@@ -1,5 +1,7 @@
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
+from iu_mongo.index import IndexDefinition
+
 
 class TestEDoc(EmbeddedDocument):
     test_int = IntField()
@@ -7,7 +9,19 @@ class TestEDoc(EmbeddedDocument):
 
 class TestDoc(Document):
     meta = {
-        'db_name': 'test'
+        'db_name': 'test',
+        'indexes': [
+            IndexDefinition.parse_from_keys_str('test_int:1'),
+            IndexDefinition.parse_from_keys_str('test_pk:-1,test_int:1'),
+            IndexDefinition.parse_from_keys_str(
+                'test_int:1,test_list:1', unique=True),
+            IndexDefinition.parse_from_keys_str('test_pk:-1', unique=True),
+            IndexDefinition.parse_from_keys_str('test_dict:1', sparse=True),
+            IndexDefinition.parse_from_keys_str(
+                'test_list:1', expire_after_seconds=10),
+            IndexDefinition.parse_from_keys_str(
+                'test_pk:1,test_int:1', unique=True),
+        ]
     }
     test_int = IntField()
     test_str = StringField()

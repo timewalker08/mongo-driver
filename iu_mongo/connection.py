@@ -3,7 +3,7 @@ from pymongo.read_preferences import ReadPreference
 from iu_mongo.errors import ConnectionError
 import collections
 
-__all__ = ['connect', '_get_db', 'clear_all']
+__all__ = ['connect', '_get_db', 'clear_all', 'get_admin_db']
 
 _connections = {}
 _dbs = {}
@@ -39,7 +39,7 @@ def connect(host='localhost', conn_name='main', db_names=[],
         'socketTimeoutMS': socketTimeoutMS,
         'connectTimeoutMS': connectTimeoutMS,
         'waitQueueTimeoutMS': waitQueueTimeoutMS,
-       # 'connect': False,
+        # 'connect': False,
         'username': username,
         'password': password,
         'authSource': auth_db,
@@ -61,7 +61,7 @@ def connect(host='localhost', conn_name='main', db_names=[],
     if conn_name not in _connections:
         try:
             conn = client_class(**mongo_client_kwargs)
-            #conn.admin.command('ismaster')
+            # conn.admin.command('ismaster')
             _connections[conn_name] = conn
         except Exception as e:
             raise ConnectionError(
@@ -72,3 +72,8 @@ def connect(host='localhost', conn_name='main', db_names=[],
                 _db_to_conn[db] = conn_name
 
     return _connections[conn_name]
+
+
+def get_admin_db(conn_name='main'):
+    conn = _connections.get(conn_name, None)
+    return conn.admin

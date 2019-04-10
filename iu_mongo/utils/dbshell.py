@@ -1,5 +1,5 @@
 from IPython.terminal.embed import InteractiveShellEmbed
-from iu_mongo import connect, clear_all
+from iu_mongo import connect, clear_all, get_admin_db
 from iu_mongo.base import BaseDocument, TopLevelDocumentMetaclass
 import pprint
 import argparse
@@ -38,10 +38,14 @@ def pp(doc):
 
 
 class DBShell(object):
-    def __init__(self, host=None, db=None):
+    def __init__(self, host=None, db=None,
+                 username=None, password=None, auth_db='admin'):
         self._document_classes = []
         self._host = host
         self._db = db
+        self._username = username
+        self._password = password
+        self._auth_db = auth_db
 
     def start(self):
         ipshell = InteractiveShellEmbed(
@@ -54,7 +58,7 @@ class DBShell(object):
         show_collections = self._show_collections
         command_docs = [
             '\033[94mconnection() -> get the current mongodb connection information\033[0m',
-            '\033[94mconnection(host, db) -> re-connect to a new mongodb host and db\033[0m',
+            '\033[94mconnection(host, db, username, password, auth_db) -> re-connect to a new mongodb host and db\033[0m',
             '\033[94mpp(doc) -> show the document information\033[0m',
             '\033[94mh() -> get help information\033[0m',
             '\033[94mshow_collections() -> get all defined document classes to manipulate\033[0m'
@@ -62,19 +66,25 @@ class DBShell(object):
         self._help_info = BANNER % {
             'commands': '\n\n'.join('\t%s' % command_doc for command_doc in command_docs)
         }
-        self._connect(self._host, self._db)
+        self._connect(self._host, self._db, self._username,
+                      self._password, self._auth_db)
         ipshell(self._help_info+"\n\n"+self._show_collections(display=False))
 
     def _help(self):
         print(self._help_info)
         self._show_collections()
 
-    def _connect(self, host=None, db=None):
+    def _connect(self, host=None, db=None, username=None, password=None,
+                 auth_db='admin'):
         if host and db:
             clear_all()
-            connect(host, db_names=[db])
+            connect(host, db_names=[db], username=username,
+                    password=password, auth_db=auth_db)
             self._host = host
             self._db = db
+            self._username = username
+            self._password = password
+            self._auth_db = auth_db
         print(HOST_INFO % {'host': self._host, 'db': self._db})
 
     def _show_collections(self, display=True):
@@ -116,11 +126,19 @@ class DBShell(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--host', default='localhost', help="MongoDB host")
-    parser.add_argument('--db', default='test', help="DB connect to")
+    parser.add_argument('--host', default='localhost',
+                        type=str, help="MongoDB host")
+    parser.add_argument('--db', default='test', type=str, help="DB connect to")
+    parser.add_argument('--username', '-u', type=str,
+                        help="username for authentication")
+    parser.add_argument('--password', '-p', type=str,
+                        help="password for authentication")
+    parser.add_argument('--auth_db', '-a', type=str, default='admin',
+                        help="auth db for authentication(default:admin)")
     parser.add_argument('module', help="module path (e.g. tests.model.testdoc)"
                         "can be a python module file path too(e.g. tests/model/testdoc.py)")
     args = parser.parse_args()
-    dbshell = DBShell(args.host, args.db)
+    dbshell = DBShell(args.host, args.db, args.username,
+                      args.password, args.auth_db)
     dbshell.load_document_classes(DBShell.parse_module(args.module))
     dbshell.start()

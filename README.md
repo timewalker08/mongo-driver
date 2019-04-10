@@ -130,7 +130,7 @@ class TestDoc(Document):
     }
 ```
 - Index manipulation example
-```python
+```
 In [1]: TestDoc.list_indexes()                                                                                                                                
 test_int_1               ()        DEFINED                       COVERED        
 _id_                     ()        DEFINED        BUILT                         

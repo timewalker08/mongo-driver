@@ -28,7 +28,8 @@ def clear_all():
 
 def connect(host='localhost', conn_name='main', db_names=[],
             port=27017, max_pool_size=None,
-            socketTimeoutMS=None, connectTimeoutMS=None, waitQueueTimeoutMS=None):
+            socketTimeoutMS=None, connectTimeoutMS=None, waitQueueTimeoutMS=None,
+            username=None, password=None, auth_db='admin', is_mock=False):
     global _connections, _db_to_conn
 
     mongo_client_kwargs = {
@@ -38,18 +39,29 @@ def connect(host='localhost', conn_name='main', db_names=[],
         'socketTimeoutMS': socketTimeoutMS,
         'connectTimeoutMS': connectTimeoutMS,
         'waitQueueTimeoutMS': waitQueueTimeoutMS,
-        'connect': False
+       # 'connect': False,
+        'username': username,
+        'password': password,
+        'authSource': auth_db,
     }
     keys = [k for k in mongo_client_kwargs.keys()]
     for k in keys:
         if mongo_client_kwargs[k] is None:
             del mongo_client_kwargs[k]
 
+    if is_mock:
+        try:
+            import mongomock
+            client_class = mongomock.MongoClient
+        except ImportError:
+            raise RuntimeError('You need mongomock installed to mock mongodb')
+    else:
+        client_class = MongoClient
     # Connect to the database if not already connected
     if conn_name not in _connections:
         try:
-            conn = MongoClient(**mongo_client_kwargs)
-            conn.admin.command('ismaster')
+            conn = client_class(**mongo_client_kwargs)
+            #conn.admin.command('ismaster')
             _connections[conn_name] = conn
         except Exception as e:
             raise ConnectionError(

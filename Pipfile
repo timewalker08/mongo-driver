@@ -16,3 +16,4 @@ dbshell = "python -Wd -m iu_mongo.utils.dbshell"
 
 [dev-packages]
 autopep8 = "*"
+mongomock = "*"

@@ -69,7 +69,7 @@ class ReadMixin(BaseMixin):
                 cur.hint(hint)
 
             if find_one:
-                for result in cur.limit(-1):
+                for result in cur.limit(1):
                     return result
                 return None
             else:

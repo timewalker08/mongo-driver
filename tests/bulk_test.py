@@ -6,7 +6,7 @@ from iu_mongo.connection import connect
 class BulkTests(unittest.TestCase):
     def setUp(self):
         try:
-            connect(db_names=['test'])
+            connect(db_names=['test'], is_mock=True)
         except ConnectionError:
             self.skipTest('Mongo service is not started localhost')
 
@@ -117,4 +117,3 @@ class BulkTests(unittest.TestCase):
         self.assertEqual(count4, 10)
         self.assertEqual(count5, 10)
         self.assertEqual(count6, 50)
-

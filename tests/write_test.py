@@ -3,7 +3,7 @@ import pymongo
 from bson import ObjectId
 from iu_mongo.errors import OperationError
 from tests.model.testdoc import TestDoc
-from iu_mongo.connection import connect
+from iu_mongo.connection import connect, clear_all
 from iu_mongo.errors import ConnectionError
 
 
@@ -13,6 +13,9 @@ class WriteTests(unittest.TestCase):
             connect(db_names=['test'], is_mock=True)
         except ConnectionError:
             self.skipTest('Mongo service is not started localhost')
+
+    def tearDown(self):
+        clear_all()
 
     def _clear(self):
         TestDoc.remove({})

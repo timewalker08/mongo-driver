@@ -73,8 +73,15 @@ class BaseMixin(object):
     def list_indexes(cls, display=True):
         from iu_mongo import TaggedIndex, IndexDefinition
         from copy import copy
-        desired_indexes = set([TaggedIndex.parse_from_index_def(index_def)
-                               for index_def in cls._meta['indexes']])
+        desired_indexes = set([])
+        for index_def in cls._meta['indexes']:
+            if isinstance(index_def, dict) and 'keys' in index_def:
+                keys = index_def.get('keys')
+                index_def = IndexDefinition.parse_from_keys_str(
+                    keys, **index_def)
+            if isinstance(index_def, IndexDefinition):
+                desired_indexes.add(
+                    TaggedIndex.parse_from_index_def(index_def))
         desired_indexes.add(
             TaggedIndex.parse_from_index_def(
                 IndexDefinition.parse_from_keys_str('_id:1'),
@@ -128,20 +135,23 @@ class BaseMixin(object):
                 else:
                     color = Color.FAIL
                 with color_terminal(color) as out:
-                    out('%-25s%-10s' % (index.real_name or index.name, index.properties_str)+'%-15s%-15s%-15s' % (
+                    out('%-25s%-15s' % (index.real_name or index.name, index.properties_str)+'%-15s%-15s%-15s' % (
                         'DEFINED' if index.defined else '',
                         'BUILT' if index.built else '',
                         'COVERED' if index.covered else ''
                     ))
+            return final_indexes
 
     @classmethod
-    def create_indexes(cls):
+    def create_indexes(cls, confirm=True):
         pymongo_collection = cls._pymongo()
         all_indexes = cls.list_indexes(display=False)
         for index in all_indexes:
             if index.built or index.covered or not index.defined:
                 continue
-            if input("Will build index %s, are you sure? (yes/no)" % str(index)) != 'yes':
+            if index.name == '_id_1':
+                continue
+            if confirm and input("Will build index %s, are you sure? (yes/no)" % str(index)) != 'yes':
                 continue
             extra_opts = {
             }

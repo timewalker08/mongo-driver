@@ -11,16 +11,13 @@ class TestDoc(Document):
     meta = {
         'db_name': 'test',
         'indexes': [
-            IndexDefinition.parse_from_keys_str('test_int:1'),
-            IndexDefinition.parse_from_keys_str('test_pk:-1,test_int:1'),
-            IndexDefinition.parse_from_keys_str(
-                'test_int:1,test_list:1', unique=True),
-            IndexDefinition.parse_from_keys_str('test_pk:-1', unique=True),
-            IndexDefinition.parse_from_keys_str('test_dict:1', sparse=True),
-            IndexDefinition.parse_from_keys_str(
-                'test_list:1', expire_after_seconds=10),
-            IndexDefinition.parse_from_keys_str(
-                'test_pk:1,test_int:1', unique=True),
+            {'keys': 'test_int:1'},
+            {'keys': 'test_pk:-1,test_int:1'},
+            {'keys': 'test_int:1,test_list:1', 'unique': True},
+            {'keys': 'test_pk:-1', 'unique': True},
+            {'keys': 'test_dict:1', 'sparse': True},
+            {'keys': 'test_list:1', 'expire_after_seconds': 10},
+            {'keys': 'test_pk:1,test_int:1', 'unique': True},
         ]
     }
     test_int = IntField()

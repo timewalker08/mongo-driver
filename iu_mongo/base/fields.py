@@ -64,7 +64,7 @@ class BaseField(object):
 
         # Assign metadata to the instance
         # This efficient method is available because no __slots__ are defined.
-        self.__dict__.update(kwargs)
+        # self.__dict__.update(kwargs)
 
         # Adjust the appropriate creation counter, and save our local copy.
         if self.db_field == '_id':

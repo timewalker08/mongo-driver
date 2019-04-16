@@ -73,7 +73,8 @@ iu_mongo provide many collection-level operations as well as document-level oper
 - update_one
 - set, unset, inc, push, pull, add_to_set
 - by_id, by_ids
-  
+- drop_collection  
+
 Also, iu_mongo support bulk-like operations, for example
 ```python
     with TestDoc.bulk() as bulk_context:
@@ -116,16 +117,13 @@ class TestDoc(Document):
     meta = {
         'db_name': 'test',
         'indexes': [
-            IndexDefinition.parse_from_keys_str('test_int:1'),
-            IndexDefinition.parse_from_keys_str('test_pk:-1,test_int:1'),
-            IndexDefinition.parse_from_keys_str(
-                'test_int:1,test_list:1', unique=True),
-            IndexDefinition.parse_from_keys_str('test_pk:-1', unique=True),
-            IndexDefinition.parse_from_keys_str('test_dict:1', sparse=True),
-            IndexDefinition.parse_from_keys_str(
-                'test_list:1', expire_after_seconds=10),
-            IndexDefinition.parse_from_keys_str(
-                'test_pk:1,test_int:1', unique=True),
+            {'keys': 'test_int:1'},
+            {'keys': 'test_pk:-1,test_int:1'},
+            {'keys': 'test_int:1,test_list:1', 'unique': True},
+            {'keys': 'test_pk:-1', 'unique': True},
+            {'keys': 'test_dict:1', 'sparse': True},
+            {'keys': 'test_list:1', 'expire_after_seconds': 10},
+            {'keys': 'test_pk:1,test_int:1', 'unique': True},
         ]
     }
 ```

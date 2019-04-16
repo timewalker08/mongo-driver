@@ -17,6 +17,9 @@ class ReadTests(unittest.TestCase):
         except ConnectionError:
             self.skipTest('Mongo service is not started localhost')
 
+    def tearDown(self):
+        clear_all()
+        
     def _clear(self):
         TestDoc.remove({})
 
@@ -125,13 +128,13 @@ class ReadTests(unittest.TestCase):
         self._clear()
         self._feed_data(1000)
         start = time.time()
-        it = TestDoc.find_iter({}, sort=[('test_int', -1)], batch_size=10)
+        it = TestDoc.find_iter({}, sort=[('test_int', -1)], batch_size=1)
         for _ in it:
             pass
         end = time.time()
         time1 = end-start
         start = time.time()
-        it = TestDoc.find_iter({}, sort=[('test_int', -1)], batch_size=100)
+        it = TestDoc.find_iter({}, sort=[('test_int', -1)], batch_size=1000)
         for _ in it:
             pass
         end = time.time()

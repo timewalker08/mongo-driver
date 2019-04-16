@@ -11,6 +11,12 @@ from iu_mongo.timer import log_slow_event
 
 class WriteMixin(BulkMixin, BaseMixin):
     @classmethod
+    def drop_collection(cls):
+        pymongo_collection = cls._pymongo(
+            write_concern=WriteConcern(w=cls._meta['write_concern']))
+        pymongo_collection.drop()
+
+    @classmethod
     def update(cls, filter, document, upsert=False, multi=True):
         if not document:
             raise ValueError("Cannot do empty updates")

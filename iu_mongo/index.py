@@ -60,7 +60,7 @@ class IndexDefinition(object):
 
     @classmethod
     def parse_from_keys_str(cls, keys_str, unique=False, sparse=False,
-                            expire_after_seconds=None):
+                            expire_after_seconds=None, **kwargs):
         keys = []
         for key in keys_str.split(','):
             key_name, key_dir = key.split(':')
@@ -110,7 +110,7 @@ class IndexDefinition(object):
         if self.sparse:
             ps.append('SPARSE')
         if self.ttl:
-            ps.append('TTL')
+            ps.append('TTL %d' % self.expire_after_seconds)
         return '(%s)' % (','.join(ps))
 
     @property
@@ -141,7 +141,7 @@ class IndexDefinition(object):
     def __eq__(self, other):
         if not isinstance(other, IndexDefinition):
             return False
-        return str(self) == str(other) and self.index_property == other.index_property
+        return self.keys == other.keys and self.index_property == other.index_property
 
 
 class TaggedIndex(IndexDefinition):

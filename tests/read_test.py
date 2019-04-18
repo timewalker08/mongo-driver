@@ -124,23 +124,6 @@ class ReadTests(unittest.TestCase):
         doc = TestDoc.find_one({})
         self.assertEqual(TestDoc.count({'id': doc.id}), 1)
 
-    def test_find_batch(self):
-        self._clear()
-        self._feed_data(1000)
-        start = time.time()
-        it = TestDoc.find_iter({}, sort=[('test_int', -1)], batch_size=1)
-        for _ in it:
-            pass
-        end = time.time()
-        time1 = end-start
-        start = time.time()
-        it = TestDoc.find_iter({}, sort=[('test_int', -1)], batch_size=1000)
-        for _ in it:
-            pass
-        end = time.time()
-        time2 = end-start
-        self.assertLess(time2, time1)
-
     def test_by_id(self):
         self._clear()
         self._feed_data(100)

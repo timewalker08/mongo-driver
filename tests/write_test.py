@@ -2,7 +2,7 @@ import unittest
 import pymongo
 from bson import ObjectId
 from iu_mongo.errors import OperationError
-from tests.model.testdoc import TestDoc
+from tests.model.testdoc import *
 from iu_mongo.connection import connect, clear_all
 from iu_mongo.errors import ConnectionError
 
@@ -208,3 +208,35 @@ class WriteTests(unittest.TestCase):
         doc = TestDoc(id=docs[0].id)
         doc.set(test_int=-1)
         self.assertEqual(doc.test_int, -1)
+
+    def test_update_document_transform(self):
+        import datetime
+        self._clear()
+        adoc = TestADoc()
+        edoc = TestEDoc(
+            test_int=1,
+            test_time=adoc,
+            test_timelist=[adoc]*3)
+        doc = TestDoc(
+            test_pk=1,
+            test_edoc=edoc,
+            test_list_edoct=[edoc]*3,
+        )
+        doc.save()
+        self.assertEqual(len(doc.test_list_edoct), 3)
+        self.assertEqual(len(doc.test_edoc.test_timelist), 3)
+        adoc = TestADoc(test_date=datetime.datetime(2019, 1, 1))
+        edoc.test_int = -5
+        edoc.test_time = adoc
+        edoc.test_timelist = [adoc]
+        doc.set(test_edoc=edoc)
+        doc.set(test_list_edoct=[edoc])
+        self.assertEqual(len(doc.test_list_edoct), 1)
+        self.assertEqual(len(doc.test_edoc.test_timelist), 1)
+        with TestDoc.bulk() as ctx:
+            edoc.test_int = -10
+            doc.bulk_set(ctx, test_edoc=edoc)
+            doc.bulk_set(ctx, test_list_edoct=[edoc])
+        doc.reload()
+        self.assertEqual(doc.test_edoc.test_int, -10)
+        self.assertEqual(doc.test_list_edoct[0].test_int, -10)

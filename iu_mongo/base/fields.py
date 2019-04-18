@@ -30,7 +30,7 @@ class BaseField(object):
     auto_creation_counter = -1
 
     def __init__(self, required=False, default=None, validation=None, choices=None,
-                 null=False, id_key=False, **kwargs):
+                 null=False, **kwargs):
         """
         :param required: If the field is required. Whether it has to have a
             value or not. Defaults to False.
@@ -49,7 +49,7 @@ class BaseField(object):
             existing attributes. Common metadata includes `verbose_name` and
             `help_text`.
         """
-        self.db_field = '_id' if id_key else ''
+        self.db_field = ''
         self.required = required
         self.default = default
         self.validation = validation

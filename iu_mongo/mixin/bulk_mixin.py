@@ -53,6 +53,7 @@ class BulkMixin(BaseMixin):
     def bulk_update(cls, bulk_context, filter, document, upsert=False, multi=True):
         if not document:
             raise ValueError("Cannot do empty updates")
+        document = cls._transform_value(document)
         if not filter:
             raise ValueError("Cannot do empty filters")
         filter = cls._update_filter(filter)

@@ -20,6 +20,7 @@ class WriteMixin(BulkMixin, BaseMixin):
     def update(cls, filter, document, upsert=False, multi=True):
         if not document:
             raise ValueError("Cannot do empty updates")
+        document = cls._transform_value(document)
         if not filter:
             raise ValueError("Cannot do empty filters")
         filter = cls._update_filter(filter)
@@ -47,6 +48,7 @@ class WriteMixin(BulkMixin, BaseMixin):
             raise ValueError("Cannot have empty update and no remove flag")
         # handle queries with inheritance
         filter = cls._update_filter(filter)
+        update = cls._transform_value(update)
         from pymongo.collection import ReturnDocument
         with log_slow_event("find_and_modify", cls._meta['collection'], filter):
             pymongo_collection = cls._pymongo(
@@ -118,6 +120,7 @@ class WriteMixin(BulkMixin, BaseMixin):
     def update_one(self, document):
         if not document:
             raise ValueError("Cannot do empty updates")
+        document = self._transform_value(document)
         query_filter = self._update_one_key()
         with log_slow_event("update_one", self._meta['collection'], query_filter):
             result = self.find_and_modify(query_filter,

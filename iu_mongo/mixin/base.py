@@ -70,6 +70,25 @@ class BaseMixin(object):
         return filter
 
     @classmethod
+    def _transform_value(cls, value):
+        from iu_mongo import EmbeddedDocument
+        if isinstance(value, EmbeddedDocument):
+            return value.to_mongo()
+        elif isinstance(value, dict):
+            data = SON()
+            for key, value in value.items():
+                new_value = cls._transform_value(value)
+                data[key] = new_value
+            return data
+        elif isinstance(value, list):
+            data = []
+            for sub_value in value:
+                data.append(cls._transform_value(sub_value))
+            return data
+        else:
+            return value
+
+    @classmethod
     def list_indexes(cls, display=True):
         from iu_mongo import TaggedIndex, IndexDefinition
         from copy import copy

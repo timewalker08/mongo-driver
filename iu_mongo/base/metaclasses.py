@@ -318,7 +318,8 @@ class TopLevelDocumentMetaclass(DocumentMetaclass):
             id_name, id_db_name = mcs.get_auto_id_names(new_class)
             new_class._auto_id_field = True
             new_class._meta['id_field'] = id_name
-            new_class._fields[id_name] = ObjectIdField(id_key=True)
+            new_class._fields[id_name] = ObjectIdField()
+            new_class._fields[id_name].db_field = id_db_name
             new_class._fields[id_name].name = id_name
             new_class.id = new_class._fields[id_name]
             new_class._db_field_map[id_name] = id_db_name

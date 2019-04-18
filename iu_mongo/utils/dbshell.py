@@ -1,6 +1,6 @@
 from IPython.terminal.embed import InteractiveShellEmbed
 from iu_mongo import connect, clear_all, get_admin_db
-from iu_mongo.base import BaseDocument, TopLevelDocumentMetaclass
+from iu_mongo.base import BaseDocument, TopLevelDocumentMetaclass, DocumentMetaclass
 import pprint
 import argparse
 from math import ceil
@@ -103,12 +103,13 @@ class DBShell(object):
         if not isinstance(doc_classes, list):
             doc_classes = [doc_classes]
         for doc_class in doc_classes:
-            if doc_class.__class__ != TopLevelDocumentMetaclass:
+            if not issubclass(doc_class.__class__, DocumentMetaclass):
                 continue
-            if doc_class._meta['abstract']:
+            globals()[doc_class.__name__] = doc_class
+            if not hasattr(doc_class, '_meta') or doc_class._meta['abstract']:
                 continue
-            if doc_class not in self._document_classes:
-                globals()[doc_class.__name__] = doc_class
+            if doc_class not in self._document_classes and \
+                    doc_class.__class__ == TopLevelDocumentMetaclass:
                 self._document_classes.append(doc_class)
 
     @staticmethod

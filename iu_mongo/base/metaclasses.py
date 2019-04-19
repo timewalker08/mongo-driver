@@ -210,16 +210,8 @@ class TopLevelDocumentMetaclass(DocumentMetaclass):
             # defaults
             attrs['_meta'] = {
                 'abstract': True,
-                'max_documents': None,
-                'max_size': None,
-                'ordering': [],  # default ordering applied at runtime
-                'indexes': [],  # indexes to be ensured at runtime
+                'indexes': [],  
                 'id_field': None,
-                'index_background': False,
-                'index_drop_dups': False,
-                'index_opts': None,
-                'delete_rules': None,
-
                 # allow_inheritance can be True, False, and None. True means
                 # "allow inheritance", False means "don't allow inheritance",
                 # None means "do whatever your parent does, or don't allow

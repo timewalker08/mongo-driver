@@ -19,8 +19,7 @@ class ReadMixin(BaseMixin):
     def _count(cls, slave_ok=SlaveOkSetting.PRIMARY, filter={},
                hint=None, limit=None, skip=0, max_time_ms=None):
         filter = cls._update_filter(filter)
-        read_preference = SlaveOkSetting.TO_PYMONGO[slave_ok]
-        pymongo_collection = cls._pymongo(read_preference=read_preference)
+        pymongo_collection = cls._pymongo(slave_ok_setting=slave_ok)
         max_time_ms = max_time_ms or cls.MAX_TIME_MS
         cls._check_read_max_time_ms(
             'count_documents', max_time_ms, pymongo_collection.read_preference)
@@ -48,12 +47,8 @@ class ReadMixin(BaseMixin):
                   batch_size=10000, max_time_ms=None):
         # transform query
         filter = cls._update_filter(filter)
-
-        read_preference = SlaveOkSetting.TO_PYMONGO[slave_ok]
-
         with log_slow_event('find', cls._meta['collection'], filter):
-            pymongo_collection = cls._pymongo(
-                read_preference=read_preference)
+            pymongo_collection = cls._pymongo(slave_ok_setting=slave_ok)
             cur = pymongo_collection.find(filter, projection,
                                           skip=skip, limit=limit,
                                           sort=sort)
@@ -115,7 +110,7 @@ class ReadMixin(BaseMixin):
     def aggregate(cls, pipeline=None, slave_ok=SlaveOkSetting.OFFLINE):
         # TODO max_time_ms: timeout control needed
         read_preference = SlaveOkSetting.TO_PYMONGO[slave_ok]
-        pymongo_collection = cls._pymongo(read_preference=read_preference)
+        pymongo_collection = cls._pymongo(slave_ok_setting=slave_ok)
         cursor_iter = pymongo_collection.aggregate(pipeline)
         for doc in cursor_iter:
             yield cls._from_son(doc)

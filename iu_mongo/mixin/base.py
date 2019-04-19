@@ -2,6 +2,7 @@ import time
 import pymongo
 import logging
 from pymongo.read_preferences import ReadPreference
+from pymongo.write_concern import WriteConcern
 from bson import SON, DBRef, ObjectId
 from iu_mongo.base import BaseDocument, get_document
 from iu_mongo.errors import ValidationError
@@ -43,11 +44,15 @@ class BaseMixin(object):
         return key
 
     @classmethod
-    def _pymongo(cls, read_preference=None, write_concern=None):
-        from iu_mongo.connection import _get_db
+    def _pymongo(cls, slave_ok_setting=None, w=None):
+        if w is None:
+            w = cls._meta.get("write_concern", None)
+        read_preference = SlaveOkSetting.TO_PYMONGO.get(slave_ok_setting, None)
+        write_concern = None if w is None else WriteConcern(w=w)
+        from iu_mongo.connection import get_db
         database = None
         collection = None
-        database = _get_db(cls._meta['db_name'])
+        database = get_db(cls._meta['db_name'])
         if database:
             collection = database[cls._meta['collection']]
         if not collection or not database:
@@ -107,7 +112,7 @@ class BaseMixin(object):
             )
         )
         pymongo_collection = cls._pymongo(
-            read_preference=SlaveOkSetting.TO_PYMONGO[SlaveOkSetting.PRIMARY])
+            slave_ok_setting=SlaveOkSetting.PRIMARY)
         pymongo_indexes = pymongo_collection.index_information()
         exist_indexes = set([
             TaggedIndex.parse_from_pymongo_index_def(index_name, index_def)

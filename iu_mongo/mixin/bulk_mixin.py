@@ -43,8 +43,7 @@ class BulkMixin(BaseMixin):
     @classmethod
     @contextlib.contextmanager
     def bulk(cls, allow_empty=True, unordered=False):
-        w = cls._meta.get('write_concern')
-        pymongo_collection = cls._pymongo(write_concern=WriteConcern(w=w))
+        pymongo_collection = cls._pymongo()
         bulk_context = BulkContext(pymongo_collection, not unordered)
         yield bulk_context
         bulk_context.execute()

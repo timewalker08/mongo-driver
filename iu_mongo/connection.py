@@ -3,20 +3,29 @@ from pymongo.read_preferences import ReadPreference
 from iu_mongo.errors import ConnectionError
 import collections
 
-__all__ = ['connect', '_get_db', 'clear_all', 'get_admin_db']
+__all__ = ['connect', 'get_db', 'get_connection', 'clear_all', 'get_admin_db']
 
 _connections = {}
 _dbs = {}
 _db_to_conn = {}
 
 
-def _get_db(db_name):
+def get_connection(conn_name="main"):
+    return _connections.get(conn_name, None)
+
+
+def get_db(db_name):
     global _dbs, _connections, _db_to_conn
     if db_name not in _dbs or not _dbs[db_name]:
         conn_name = _db_to_conn.get(db_name, None)
         conn = _connections.get(conn_name, None)
         _dbs[db_name] = conn and conn[db_name]
     return _dbs[db_name]
+
+
+def get_admin_db(conn_name='main'):
+    conn = _connections.get(conn_name, None)
+    return conn.admin
 
 
 def clear_all():
@@ -27,7 +36,7 @@ def clear_all():
 
 
 def connect(host='localhost', conn_name='main', db_names=[],
-            port=27017, max_pool_size=None,
+            port=27017, max_pool_size=None, w='majority',
             socketTimeoutMS=None, connectTimeoutMS=None, waitQueueTimeoutMS=None,
             username=None, password=None, auth_db='admin', is_mock=False):
     global _connections, _db_to_conn
@@ -35,6 +44,7 @@ def connect(host='localhost', conn_name='main', db_names=[],
     mongo_client_kwargs = {
         'host': host,
         'port': port,
+        'w': w,
         'maxPoolSize': max_pool_size,
         'socketTimeoutMS': socketTimeoutMS,
         'connectTimeoutMS': connectTimeoutMS,
@@ -72,8 +82,3 @@ def connect(host='localhost', conn_name='main', db_names=[],
                 _db_to_conn[db] = conn_name
 
     return _connections[conn_name]
-
-
-def get_admin_db(conn_name='main'):
-    conn = _connections.get(conn_name, None)
-    return conn.admin

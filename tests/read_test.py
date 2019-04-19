@@ -13,7 +13,7 @@ from iu_mongo import SlaveOkSetting
 class ReadTests(unittest.TestCase):
     def setUp(self):
         try:
-            connect(db_names=['test'], conn_name='test', is_mock=True)
+            connect(db_names=['test'], conn_name='test')
         except ConnectionError:
             self.skipTest('Mongo service is not started localhost')
 

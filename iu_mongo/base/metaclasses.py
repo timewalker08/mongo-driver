@@ -226,7 +226,6 @@ class TopLevelDocumentMetaclass(DocumentMetaclass):
                 # inheritance if you're a top-level class".
                 'allow_inheritance': None,
                 'force_insert': True,
-                'write_concern': 'majority'
             }
             attrs['_is_base_cls'] = True
             attrs['_meta'].update(attrs.get('meta', {}))

@@ -12,8 +12,7 @@ from iu_mongo.timer import log_slow_event
 class WriteMixin(BulkMixin, BaseMixin):
     @classmethod
     def drop_collection(cls):
-        pymongo_collection = cls._pymongo(
-            write_concern=WriteConcern(w=cls._meta['write_concern']))
+        pymongo_collection = cls._pymongo()
         pymongo_collection.drop()
 
     @classmethod
@@ -25,8 +24,7 @@ class WriteMixin(BulkMixin, BaseMixin):
             raise ValueError("Cannot do empty filters")
         filter = cls._update_filter(filter)
         with log_slow_event("update", cls._meta['collection'], filter):
-            pymongo_collection = cls._pymongo(
-                write_concern=WriteConcern(w=cls._meta['write_concern']))
+            pymongo_collection = cls._pymongo()
             if multi:
                 result = pymongo_collection.update_many(
                     filter, document, upsert=upsert)
@@ -51,8 +49,7 @@ class WriteMixin(BulkMixin, BaseMixin):
         update = cls._transform_value(update)
         from pymongo.collection import ReturnDocument
         with log_slow_event("find_and_modify", cls._meta['collection'], filter):
-            pymongo_collection = cls._pymongo(
-                write_concern=WriteConcern(w=cls._meta['write_concern']))
+            pymongo_collection = cls._pymongo()
             if remove:
                 result = pymongo_collection.find_one_and_delete(
                     filter,
@@ -77,8 +74,7 @@ class WriteMixin(BulkMixin, BaseMixin):
     def remove(cls, filter, multi=True):
         filter = cls._update_filter(filter)
         with log_slow_event("remove", cls._meta['collection'], filter):
-            pymongo_collection = cls._pymongo(
-                write_concern=WriteConcern(w=cls._meta['write_concern']))
+            pymongo_collection = cls._pymongo()
             if multi:
                 result = pymongo_collection.delete_many(filter)
             else:
@@ -95,8 +91,7 @@ class WriteMixin(BulkMixin, BaseMixin):
         self.validate()
         doc = self.to_mongo()
         try:
-            w = self._meta['write_concern']
-            collection = self._pymongo(write_concern=WriteConcern(w=w))
+            collection = self._pymongo()
             if force_insert or "_id" not in doc:
                 pk_value = collection.insert_one(doc).inserted_id
             else:

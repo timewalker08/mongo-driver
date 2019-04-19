@@ -11,6 +11,10 @@ Supported python version
 =======
 python 3+ is supported
 
+Supported MongoDB version
+=======
+MongoDB 3.2+ is supported
+
 Installation
 =====
 just install iu_mongo as a VCS pip package installation in editable mode
@@ -23,6 +27,20 @@ Connect to mongodb
 from iu_mongo import connect
 connect(host="MONGODB_HOST",db_names=["DB_NAME"], username='username', password='password', auth_db='admin')
 ```
+You can also set key word arguments `w(integer or string)` to set **write concern** in connection level   (i.e. default 'majority'), by doing so, all dbs/collections under this connection will use this **write concern**, unless you specify it in meta dict of the document definition class explicitly, which will override the default **write concern** settings. For example
+```python
+from iu_mongo import Document
+from iu_mongo import connect
+
+class Doc(Document):
+    meta={
+        'db_name':'test',
+        'write_concern':1
+    }
+
+connect(db_names=['test'],w='majority')
+```
+Even though the write concern of the connection is 'majority' but the write concern of Doc itself is '1' as specified in the Doc class
 
 Document Definition
 =============

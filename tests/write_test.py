@@ -10,7 +10,7 @@ from iu_mongo.errors import ConnectionError
 class WriteTests(unittest.TestCase):
     def setUp(self):
         try:
-            connect(db_names=['test'], is_mock=True)
+            connect(db_names=['test'])
         except ConnectionError:
             self.skipTest('Mongo service is not started localhost')
 

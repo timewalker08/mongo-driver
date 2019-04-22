@@ -15,6 +15,17 @@ class TestEDoc(EmbeddedDocument):
 
 
 class TestDoc(Document):
+    JSON_SCHEMA = {
+        'bsonType': 'object',
+        'required': ['test_pk'],
+        'properties': {
+            'test_pk': {
+                'bsonType': 'int',
+                'description': 'must be int',
+                'enum': [1, 2, 3]
+            }
+        }
+    }
     meta = {
         'db_name': 'test',
         'indexes': [

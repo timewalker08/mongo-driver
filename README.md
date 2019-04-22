@@ -13,7 +13,7 @@ python 3+ is supported
 
 Supported MongoDB version
 =======
-MongoDB 3.2+ is supported
+MongoDB 4.0+ is supported
 
 Installation
 =====
@@ -181,3 +181,8 @@ Contribute guidelines
 3. Write your codes to add new features to iu_mongo
 4. Before commit your codes, please write unit test to make sure iu_mongo will perform well based on your change, run `pipenv run test_all` to issue an entire testing and make sure all test cases are PASSED. You can also run `pipenv run test_single MODULE/CLASS/CLASS METHOD/MODULE PATH` to just issue a test in your test module or class, this is useful when you just want your new-write test cases are tested.
 5. After everything is done (write codes, test codes), push your commits and issue a pull request if needed be.
+
+TODO
+=====
+1. Setup mongodb document validation rules in mongodb layer, not mongo driver layer
+2. Transaction support for driver

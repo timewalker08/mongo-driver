@@ -40,7 +40,7 @@ if six.PY3:
 
 
 __all__ = (
-    'StringField', 'URLField', 'EmailField', 'IntField', 'LongField',
+    'StringField', 'URLField', 'EmailField', 'IntField',
     'FloatField', 'DecimalField', 'BooleanField', 'DateTimeField', 'DateField',
     'EmbeddedDocumentField', 'ObjectIdField', 'ListField',
     'SortedListField', 'EmbeddedDocumentListField', 'DictField', 'MapField',
@@ -58,15 +58,6 @@ class StringField(BaseField):
         self.max_length = max_length
         self.min_length = min_length
         super(StringField, self).__init__(**kwargs)
-
-    def to_python(self, value):
-        if isinstance(value, six.text_type):
-            return value
-        try:
-            value = value.decode('utf-8')
-        except Exception:
-            pass
-        return value
 
     def validate(self, value):
         if not isinstance(value, six.string_types):
@@ -275,42 +266,6 @@ class IntField(BaseField):
             return value
 
         return super(IntField, self).prepare_query_value(op, int(value))
-
-
-class LongField(BaseField):
-    """64-bit integer field."""
-
-    def __init__(self, min_value=None, max_value=None, **kwargs):
-        self.min_value, self.max_value = min_value, max_value
-        super(LongField, self).__init__(**kwargs)
-
-    def to_python(self, value):
-        try:
-            value = long(value)
-        except (TypeError, ValueError):
-            pass
-        return value
-
-    def to_mongo(self, value):
-        return Int64(value)
-
-    def validate(self, value):
-        try:
-            value = long(value)
-        except (TypeError, ValueError):
-            self.error('%s could not be converted to long' % value)
-
-        if self.min_value is not None and value < self.min_value:
-            self.error('Long value is too small')
-
-        if self.max_value is not None and value > self.max_value:
-            self.error('Long value is too large')
-
-    def prepare_query_value(self, op, value):
-        if value is None:
-            return value
-
-        return super(LongField, self).prepare_query_value(op, long(value))
 
 
 class FloatField(BaseField):

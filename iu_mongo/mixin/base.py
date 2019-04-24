@@ -44,11 +44,7 @@ class BaseMixin(object):
         return key
 
     @classmethod
-    def _pymongo(cls, slave_ok_setting=None, w=None):
-        if w is None:
-            w = cls._meta.get("write_concern", None)
-        read_preference = SlaveOkSetting.TO_PYMONGO.get(slave_ok_setting, None)
-        write_concern = None if w is None else WriteConcern(w=w)
+    def _pymongo(cls, slave_ok_setting=None):
         from iu_mongo.connection import get_db
         database = None
         collection = None
@@ -58,9 +54,16 @@ class BaseMixin(object):
         if not collection or not database:
             raise ConnectionError(
                 'No mongo connections for collection %s' % cls.__name__)
+        # override default configuration if possible
+        read_preference = SlaveOkSetting.TO_PYMONGO.get(slave_ok_setting, None)
+        default_write_concern = collection.write_concern
+        w = cls._meta.get(
+            "write_concern", default_write_concern.document.get('w', None))
+        wtimeout = cls._meta.get(
+            "wtimeout", default_write_concern.document.get('wtimeout', None))
         return collection.with_options(
             read_preference=read_preference,
-            write_concern=write_concern)
+            write_concern=WriteConcern(w=w, wtimeout=wtimeout))
 
     @classmethod
     def _update_filter(cls, filter):

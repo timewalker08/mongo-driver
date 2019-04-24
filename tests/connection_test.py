@@ -1,7 +1,8 @@
 import unittest
 import pymongo
 import mongomock
-from iu_mongo.connection import connect, get_db, get_connection, clear_all, get_admin_db
+from iu_mongo.connection import connect, get_db, get_connection, clear_all, \
+    get_admin_db, DEFAULT_WRITE_CONCERN, DEFAULT_WTIMEOUT
 from iu_mongo import Document
 from iu_mongo.fields import IntField
 from iu_mongo.errors import OperationError
@@ -91,6 +92,8 @@ class ConnectionTests(unittest.TestCase):
         self.assertEqual(conn.max_pool_size, 321)
 
     def test_write_concern(self):
+        LARGE_W = 100
+
         class Doc1(Document):
             meta = {
                 'db_name': 'test1',
@@ -100,7 +103,8 @@ class ConnectionTests(unittest.TestCase):
         class Doc2(Document):
             meta = {
                 'db_name': 'test2',
-                'write_concern': 3
+                'write_concern': LARGE_W,
+                'wtimeout': 5000,
             }
             test_int = IntField()
 
@@ -111,22 +115,35 @@ class ConnectionTests(unittest.TestCase):
         admin = get_admin_db('conn1')
         self.assertEqual(conn1.write_concern.document['w'], 1)
         self.assertEqual(admin.write_concern.document['w'], 1)
+        self.assertEqual(
+            conn1.write_concern.document['wtimeout'], DEFAULT_WTIMEOUT)
+        self.assertEqual(
+            admin.write_concern.document['wtimeout'], DEFAULT_WTIMEOUT)
         conn2 = connect(
             conn_name='conn2',
-            w=2,
-            db_names=['test1']
+            w=LARGE_W,
+            db_names=['test1'],
+            wtimeout=2000,
         )
-        self.assertEqual(conn2.write_concern.document['w'], 2)
-        self.assertEqual(Doc1._pymongo().write_concern.document['w'], 2)
+        self.assertEqual(conn2.write_concern.document['w'], LARGE_W)
+        self.assertEqual(Doc1._pymongo().write_concern.document['w'], LARGE_W)
+        self.assertEqual(conn2.write_concern.document['wtimeout'], 2000)
+        self.assertEqual(
+            Doc1._pymongo().write_concern.document['wtimeout'], 2000)
         doc1 = Doc1(test_int=1)
         self.assertRaises(OperationError, doc1.save)
         conn3 = connect(
             conn_name='conn3',
             db_names=['test2']
         )
-        self.assertEqual(conn3.write_concern.document['w'], 'majority')
         self.assertEqual(
-            Doc2._pymongo().write_concern.document['w'], 3)
+            conn3.write_concern.document['w'], DEFAULT_WRITE_CONCERN)
+        self.assertEqual(
+            Doc2._pymongo().write_concern.document['w'], LARGE_W)
+        self.assertEqual(
+            conn3.write_concern.document['wtimeout'], DEFAULT_WTIMEOUT)
+        self.assertEqual(
+            Doc2._pymongo().write_concern.document['wtimeout'], 5000)
         doc2 = Doc2(test_int=2)
         self.assertRaises(OperationError, doc2.save)
         clear_all()

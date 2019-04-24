@@ -3,11 +3,15 @@ from pymongo.read_preferences import ReadPreference
 from iu_mongo.errors import ConnectionError
 import collections
 
-__all__ = ['connect', 'get_db', 'get_connection', 'clear_all', 'get_admin_db']
+__all__ = ['connect', 'get_db', 'get_connection', 'clear_all', 'get_admin_db',
+           'DEFAULT_WRITE_CONCERN', 'DEFAULT_WTIMEOUT']
 
 _connections = {}
 _dbs = {}
 _db_to_conn = {}
+
+DEFAULT_WRITE_CONCERN = 'majority'
+DEFAULT_WTIMEOUT = 5000
 
 
 def get_connection(conn_name="main"):
@@ -36,15 +40,18 @@ def clear_all():
 
 
 def connect(host='localhost', conn_name='main', db_names=[],
-            port=27017, max_pool_size=None, w='majority',
-            socketTimeoutMS=None, connectTimeoutMS=None, waitQueueTimeoutMS=None,
-            username=None, password=None, auth_db='admin', is_mock=False):
+            port=27017, max_pool_size=None, w=DEFAULT_WRITE_CONCERN,
+            wtimeout=DEFAULT_WTIMEOUT, socketTimeoutMS=None,
+            connectTimeoutMS=None, waitQueueTimeoutMS=None,
+            username=None, password=None, auth_db='admin', is_mock=False,
+            replica_set=None):
     global _connections, _db_to_conn
 
     mongo_client_kwargs = {
         'host': host,
         'port': port,
         'w': w,
+        'wtimeout': wtimeout,
         'maxPoolSize': max_pool_size,
         'socketTimeoutMS': socketTimeoutMS,
         'connectTimeoutMS': connectTimeoutMS,
@@ -53,6 +60,7 @@ def connect(host='localhost', conn_name='main', db_names=[],
         'username': username,
         'password': password,
         'authSource': auth_db,
+        'replicaSet': replica_set,
     }
     keys = [k for k in mongo_client_kwargs.keys()]
     for k in keys:

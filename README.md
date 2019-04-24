@@ -7,7 +7,7 @@ Supported pymongo version
 ================
 pymongo with version 3.7+ is supported
 
-Supported python version
+Supported Python version
 =======
 python 3+ is supported
 
@@ -21,13 +21,15 @@ just install iu_mongo as a VCS pip package installation in editable mode
 
     pip install -e git+git://github.com/intelligenceunion/mongo-driver.git
 
-Connect to mongodb
+Connect to MongoDB
 =======
 ```python
 from iu_mongo import connect
 connect(host="MONGODB_HOST",db_names=["DB_NAME"], username='username', password='password', auth_db='admin')
 ```
-You can also set key word arguments `w(integer or string)` to set **write concern** in connection level   (i.e. default 'majority'), by doing so, all dbs/collections under this connection will use this **write concern**, unless you specify it in meta dict of the document definition class explicitly, which will override the default **write concern** settings. For example
+
+### Write Concern 
+You can set keyword arguments `w(integer or string)` and `wtimeout(integer)` to set [Write Conern](https://docs.mongodb.com/manual/reference/write-concern/) in connection level   (i.e. default is `{'w':'majority','wtimeout':5000}`), by doing so, all dbs/collections under this connection will use this **write concern**, unless you specify it in meta dict of the document definition class explicitly, which will override the default **write concern** settings. For example
 ```python
 from iu_mongo import Document
 from iu_mongo import connect
@@ -35,13 +37,41 @@ from iu_mongo import connect
 class Doc(Document):
     meta={
         'db_name':'test',
-        'write_concern':1
+        'write_concern':1,
+        'wtimeout':1000,
     }
 
-connect(db_names=['test'],w='majority')
+connect(db_names=['test'])
 ```
-Even though the write concern of the connection is 'majority' but the write concern of Doc itself is '1' as specified in the Doc class
+Even though the write concern of the connection is `{'w':'majority','wtimeout':5000}` the actual write concern of **Doc** is `{'w':1,'wtimeout':1000}` as specified in the Doc class
 
+### Replica Set Configuration
+You can pass `replica_set` keyword argument to specify the replica set you are connecting to if you mongodb deployment is a replica set.
+
+### Examples
+1. Your MongoDB deployment is a single mongod instance
+   ```python
+   from iu_mongo import connect
+   connect(host='MONGOD_IP:PORT')
+   ```
+2. Your MongoDB deployment is a replica set
+   ```python
+   from iu_mongo import connect
+   # recommended way
+   connect(host="ANY_REPLICA_NODE_IP:PORT",replica_set="REPLICA_SET_NAME")
+   ```
+   or
+   ```python
+   from iu_mongo import connect
+   # all node ips are needed if replica_set not specified
+   connect(host=["NODE_1_IP:PORT","NODE_2_IP:PORT"])
+   ```
+3. Your MongoDB deployment is a shard cluster
+   ```python
+   from iu_mongo import connect
+   # pass a mongos node list if you have multi mongos
+   connect(host=['MONGOS_NODE:PORT'])
+   ```
 Document Definition
 =============
 **Document Definition** is very like to mongoengine. Still, little difference is between them.

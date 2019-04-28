@@ -48,7 +48,9 @@ class NotUniqueError(OperationError):
 class SaveConditionError(OperationError):
     pass
 
-
+class TransactionError(OperationError):
+    pass
+    
 class FieldDoesNotExist(IUMongoError):
     pass
 

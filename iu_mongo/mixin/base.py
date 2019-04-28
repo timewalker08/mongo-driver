@@ -3,11 +3,13 @@ import pymongo
 import logging
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
+from pymongo.collection import Collection
 from bson import SON, DBRef, ObjectId
 from iu_mongo.base import BaseDocument, get_document
 from iu_mongo.errors import ValidationError
 from iu_mongo.timer import log_slow_event
-from iu_mongo.connection import ConnectionError
+from iu_mongo.connection import ConnectionError, get_connection
+from iu_mongo.session import Session
 from iu_mongo import SlaveOkSetting
 from iu_mongo.utils.terminal import color_terminal, Color
 
@@ -44,13 +46,18 @@ class BaseMixin(object):
         return key
 
     @classmethod
-    def _pymongo(cls, slave_ok_setting=None):
+    def _pymongo(cls, create=False, slave_ok_setting=None):
         from iu_mongo.connection import get_db
         database = None
         collection = None
         database = get_db(cls._meta['db_name'])
+        collection_name = cls._meta['collection']
         if database:
-            collection = database[cls._meta['collection']]
+            try:
+                collection = Collection(
+                    database, collection_name, create=create)
+            except pymongo.errors.OperationFailure:
+                collection = Collection(database, collection_name)
         if not collection or not database:
             raise ConnectionError(
                 'No mongo connections for collection %s' % cls.__name__)
@@ -195,3 +202,11 @@ class BaseMixin(object):
     def drop_index(cls, index_name):
         pymongo_collection = cls._pymongo()
         pymongo_collection.drop_index(index_name)
+
+    @classmethod
+    def get_connection(cls):
+        return get_connection(db_name=cls._meta['db_name'])
+
+    @classmethod
+    def create_collection_if_not_exists(cls):
+        cls._pymongo(create=True)

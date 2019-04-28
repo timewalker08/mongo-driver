@@ -112,6 +112,7 @@ iu_mongo provide many collection-level operations as well as document-level oper
 - find_one
 - count
 - distinct
+- aggregate
 - reload
 - update
 - find_and_modify
@@ -146,6 +147,46 @@ supported bulk operations are
 - bulk_push
 - bulk_pull
 - bulk_add_to_set
+
+### Multi-document Transactions
+Transaction is supported in iu_mongo, for example, say we have two document definition in the following example:
+```python
+class CollA(Document):
+    meta = {
+        'db_name': 'test1'
+    }
+    test_int = IntField()
+
+class CollB(Document):
+    meta = {
+        'db_name': 'test2'
+    }
+    test_int = IntField()
+```
+Now let's assume there is one doc in both CollA and CollB
+```python
+CollA(test_int=100).save()
+CollB(test_int=200).save()
+```
+Then a common transaction may be like the following:
+```python
+connection = connect(db_names=['test1', 'test2'])
+with connection.start_session() as session:
+    with session.start_transaction():
+        CollA.update({}, {'$inc': {'test_int': 50}}, session=session)
+        CollB.update({}, {'$inc': {'test_int': -50}}, session=session)
+```
+As a summary:
+1. First, get a `connection` to mongodb (transactions can be cross collections/databases in one connection) 
+2. Start a `session` from the connection(using `with`), mongodb provide **causal consistency** under one session, please refer [here](https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/)
+3. Start a `transaction` from the session(using `with`)
+4. Issue your actions in transcation with the current session (pass `session` keyword argument to every action)
+5. Transaction will commit automatically if no exception occurs
+   
+
+
+Refer to `transaction_test.py` for more examples of transactions.
+Also, you can learn transactions from [MongoDB](https://docs.mongodb.com/manual/core/transactions/)
 
 
 DBShell
@@ -215,4 +256,3 @@ Contribute guidelines
 TODO
 =====
 1. Setup mongodb document validation rules in mongodb layer, not mongo driver layer
-2. Transaction support for driver

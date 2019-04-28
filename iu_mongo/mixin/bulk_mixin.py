@@ -9,10 +9,11 @@ from iu_mongo.mixin.base import BaseMixin
 
 
 class BulkContext(object):
-    def __init__(self, pymongo_collection, ordered):
+    def __init__(self, pymongo_collection, ordered, session=None):
         self._ordered = ordered
         self._pymongo_collection = pymongo_collection
         self._requests = []
+        self._pymongo_session = session and session.pymongo_session
 
     def bulk_update(self, filter, document, upsert, multi):
         if multi:
@@ -34,7 +35,7 @@ class BulkContext(object):
             return
         try:
             self._pymongo_result = self._pymongo_collection.bulk_write(
-                self._requests, ordered=self._ordered)
+                self._requests, ordered=self._ordered, session=self._pymongo_session)
         except pymongo.errors.BulkWriteError as e:
             raise BulkOperationError(e)
 
@@ -42,9 +43,10 @@ class BulkContext(object):
 class BulkMixin(BaseMixin):
     @classmethod
     @contextlib.contextmanager
-    def bulk(cls, allow_empty=True, unordered=False):
+    def bulk(cls, allow_empty=True, unordered=False, session=None):
         pymongo_collection = cls._pymongo()
-        bulk_context = BulkContext(pymongo_collection, not unordered)
+        bulk_context = BulkContext(
+            pymongo_collection, not unordered, session=session)
         yield bulk_context
         bulk_context.execute()
 
@@ -69,13 +71,6 @@ class BulkMixin(BaseMixin):
         cls = self.__class__
         self.validate()
         doc = self.to_mongo()
-        id_field = cls.id
-        id_name = id_field.name or 'id'
-        if self[id_name] is None:
-            object_id = ObjectId()
-            doc[id_field.db_field] = id_field.to_mongo(object_id)
-        else:
-            object_id = self[id_name]
         bulk_context.bulk_save(doc)
 
     def bulk_update_one(self, bulk_context, document):

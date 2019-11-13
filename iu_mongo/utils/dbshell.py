@@ -39,10 +39,11 @@ def pp(doc):
 
 
 class DBShell(object):
-    def __init__(self, host=None, db=None,
+    def __init__(self, host=None, port=None, db=None,
                  username=None, password=None, auth_db='admin', replica_set=None):
         self._document_classes = []
         self._host = host
+        self._port = port
         self._db = db
         self._username = username
         self._password = password
@@ -68,7 +69,7 @@ class DBShell(object):
         self._help_info = BANNER % {
             'commands': '\n\n'.join('\t%s' % command_doc for command_doc in command_docs)
         }
-        self._connect(self._host, self._db, self._username,
+        self._connect(self._host, self._port, self._db, self._username,
                       self._password, self._auth_db, self._replica_set)
         ipshell(self._help_info+"\n\n"+self._show_collections(display=False))
 
@@ -76,20 +77,22 @@ class DBShell(object):
         print(self._help_info)
         self._show_collections()
 
-    def _connect(self, host=None, db=None, username=None, password=None,
+    def _connect(self, host=None, port=None, db=None, username=None, password=None,
                  auth_db='admin', replica_set=None):
         if host and db:
             clear_all()
-            connect(host, db_names=[db], username=username,
+            connect(host, port=port, db_names=[db], username=username,
                     password=password, auth_db=auth_db, replica_set=replica_set)
             self._host = host
             self._db = db
+            self._port = port
             self._username = username
             self._password = password
             self._auth_db = auth_db
             self._replica_set = replica_set
         print(HOST_INFO % {
             'host': self._host,
+            'port': self._port,
             'db': self._db,
             'replica_set': self._replica_set,
         })

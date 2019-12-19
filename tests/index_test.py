@@ -16,13 +16,21 @@ class TestIndexDoc(Document):
             {'keys': 'test_int:hashed'},
             {'keys': 'test_str:-1', 'sparse': True},
             {'keys': 'float:1'},
-            {'keys': 'test_date:1', 'expire_after_seconds': 10}
+            {'keys': 'test_date:1', 'expire_after_seconds': 10},
+            {
+                'keys': 'test_int_p:1', 
+                'unique': True,
+                "partialFilterExpression": {
+                    "test_int": {"$gt": 100}
+                }
+            }
         ]
     }
     test_int = IntField()
     test_str = StringField()
     test_float = FloatField()
     test_date = DateTimeField()
+    test_int_p = IntField()
 
 
 class IndexTests(unittest.TestCase):

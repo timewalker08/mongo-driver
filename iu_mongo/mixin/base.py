@@ -191,6 +191,8 @@ class BaseMixin(object):
             }
             if index.expire_after_seconds is not None:
                 extra_opts['expireAfterSeconds'] = index.expire_after_seconds
+            if index.partial_filter_expression is not None:
+                extra_opts['partialFilterExpression'] = index.partial_filter_expression
             pymongo_collection.create_index(
                 index.to_pymongo_keys(),
                 background=True,

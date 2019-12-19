@@ -70,9 +70,11 @@ class IndexDefinition(object):
         keys = OrderedDict(keys)
         return cls(keys, unique, sparse, expire_after_seconds)
 
-    def __init__(self, keys, unique=False, sparse=False, expire_after_seconds=None):
+    def __init__(self, keys, unique=False, sparse=False, expire_after_seconds=None,
+                 partial_filter_expression=None):
         self.keys = keys
         self.expire_after_seconds = expire_after_seconds
+        self.partial_filter_expression = partial_filter_expression
         if len(self.keys) == 0:
             raise Exception('Empty keys definition')
         self.index_property =\
@@ -155,7 +157,7 @@ class TaggedIndex(IndexDefinition):
 
     @classmethod
     def parse_from_pymongo_index_def(cls, index_name, index_def):
-        unique = sparse = expire_after_seconds = None
+        unique = sparse = expire_after_seconds = partial_filter_expression = None
         keys = []
         for k, v in index_def.items():
             if k == 'key':
@@ -171,8 +173,11 @@ class TaggedIndex(IndexDefinition):
                 sparse = bool(v)
             if k == 'expireAfterSeconds':
                 expire_after_seconds = int(v)
+            if k == 'partialFilterExpression':
+                partial_filter_expression = dict(v)
         return cls(keys, real_name=index_name, unique=unique, sparse=sparse,
-                   expire_after_seconds=expire_after_seconds)
+                   expire_after_seconds=expire_after_seconds,
+                   partial_filter_expression=partial_filter_expression)
 
     @classmethod
     def parse_from_index_def(cls, index_def):

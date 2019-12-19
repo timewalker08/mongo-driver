@@ -20,7 +20,7 @@ class TestIndexDoc(Document):
             {
                 'keys': 'test_int_p:1', 
                 'unique': True,
-                "partialFilterExpression": {
+                "partial_filter_expression": {
                     "test_int": {"$gt": 100}
                 }
             }

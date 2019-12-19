@@ -60,7 +60,7 @@ class IndexDefinition(object):
 
     @classmethod
     def parse_from_keys_str(cls, keys_str, unique=False, sparse=False,
-                            expire_after_seconds=None, **kwargs):
+                            expire_after_seconds=None, partial_filter_expression=None):
         keys = []
         for key in keys_str.split(','):
             key_name, key_dir = key.split(':')
@@ -68,7 +68,7 @@ class IndexDefinition(object):
                 key_name = '_id'
             keys.append((key_name, KeyDirection.STR_TO_NUM[key_dir]))
         keys = OrderedDict(keys)
-        return cls(keys, unique, sparse, expire_after_seconds)
+        return cls(keys, unique, sparse, expire_after_seconds, partial_filter_expression)
 
     def __init__(self, keys, unique=False, sparse=False, expire_after_seconds=None,
                  partial_filter_expression=None):

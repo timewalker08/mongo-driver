@@ -60,7 +60,7 @@ class IndexDefinition(object):
 
     @classmethod
     def parse_from_keys_str(cls, keys_str, unique=False, sparse=False,
-                            expire_after_seconds=None, partial_filter_expression=None):
+                            expire_after_seconds=None, partial_filter_expression=None,  **kwargs):
         keys = []
         for key in keys_str.split(','):
             key_name, key_dir = key.split(':')

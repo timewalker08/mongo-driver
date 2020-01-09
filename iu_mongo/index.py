@@ -183,7 +183,8 @@ class TaggedIndex(IndexDefinition):
     def parse_from_index_def(cls, index_def):
         return cls(keys=index_def.keys, unique=index_def.unique,
                    sparse=index_def.sparse,
-                   expire_after_seconds=index_def.expire_after_seconds)
+                   expire_after_seconds=index_def.expire_after_seconds，
+                   partial_filter_expression=index_def.partial_filter_expression)
 
     @property
     def built(self):

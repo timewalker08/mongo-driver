@@ -92,7 +92,7 @@ class TransactionTests(unittest.TestCase):
             self.assertEqual(Doc.count({}, session=session), 1)
             self.assertEqual(len(result_3), 0)
             self.assertEqual(len(result_4), 1)
-            self.assertEqual(result_4[0].id, result_2[0].id)
+            self.assertEqual(result_4[0]['_id'], result_2[0].id)
             doc = result_2[0]
             Doc.update({
                 'test_int': 2

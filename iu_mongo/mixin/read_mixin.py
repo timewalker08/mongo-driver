@@ -121,7 +121,7 @@ class ReadMixin(BaseMixin):
         cursor_iter = pymongo_collection.aggregate(pipeline,
                                                    session=session and session.pymongo_session)
         for doc in cursor_iter:
-            yield cls._from_son(doc)
+            yield doc
 
     @classmethod
     @retry(exceptions=RETRY_ERRORS, tries=5, delay=5, logger=RETRY_LOGGER)

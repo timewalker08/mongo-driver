@@ -247,11 +247,20 @@ In [13]: TestDoc.drop_index('test_pk_-1')
 
 Contribute guidelines
 =====
-1. Make sure you have [pipenv](https://pipenv.readthedocs.io/en/latest/) and python3 environment
-2. Clone or fork this repo then run `pipenv install` in the repo directory to setup a python virtual environment with all dev dependencies installed.
-3. Write your codes to add new features to iu_mongo
-4. Before commit your codes, please write unit test to make sure iu_mongo will perform well based on your change, run `pipenv run test_all` to issue an entire testing and make sure all test cases are PASSED. You can also run `pipenv run test_single MODULE/CLASS/CLASS METHOD/MODULE PATH` to just issue a test in your test module or class, this is useful when you just want your new-write test cases are tested.
-5. After everything is done (write codes, test codes), push your commits and issue a pull request if needed be.
+1. You MUST have a local mongo replica set for tests to be run, the simplest way is to use `docker` to generate one. You can build the image using the following command
+    ``` 
+    docker build -t test_mongo .
+    ```
+    then you can start up the mongo replica set by
+    ```
+    docker run -d -p 27017:27017 test_mongo
+    ```
+    at last, you must launch mongo shell and call `rs.initiate()` to setup the test mongo replica set.
+2. Make sure you have [pipenv](https://pipenv.readthedocs.io/en/latest/) and python3 environment
+3. Clone or fork this repo then run `pipenv install` in the repo directory to setup a python virtual environment with all dev dependencies installed.
+4. Write your codes to add new features to iu_mongo
+5. Before commit your codes, please write unit test to make sure iu_mongo will perform well based on your change, run `pipenv run test_all` to issue an entire testing and make sure all test cases are PASSED. You can also run `pipenv run test_single MODULE/CLASS/CLASS METHOD/MODULE PATH` to just issue a test in your test module or class, this is useful when you just want your new-write test cases are tested.
+6. After everything is done (write codes, test codes), push your commits and issue a pull request if needed be.
 
 TODO
 =====

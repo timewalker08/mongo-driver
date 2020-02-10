@@ -100,7 +100,7 @@ class ReadTests(unittest.TestCase):
         docs = list(TestDoc.aggregate([]))
         self.assertEqual(len(docs), 100)
         for doc in docs:
-            self.assertIsInstance(doc, TestDoc)
+            self.assertIsInstance(doc, dict)
 
     def test_read_preference(self):
         self._clear()

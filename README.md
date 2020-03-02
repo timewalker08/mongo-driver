@@ -19,7 +19,7 @@ Installation
 =====
 just install iu_mongo as a VCS pip package installation in editable mode
 
-    pip install -e git+git://github.com/intelligenceunion/mongo-driver.git
+    pip install -e git+git://gitlab.com/comet-tech/mongo-driver.git
 
 Connect to MongoDB
 =======

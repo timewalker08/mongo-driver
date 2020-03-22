@@ -5,10 +5,10 @@ import time
 from retry import retry
 from bson import ObjectId
 from pymongo.read_preferences import ReadPreference
-from iu_mongo.mixin.base import BaseMixin, RETRY_ERRORS,\
+from mongo_driver.mixin.base import BaseMixin, RETRY_ERRORS,\
     RETRY_LOGGER
-from iu_mongo.timer import log_slow_event
-from iu_mongo import SlaveOkSetting
+from mongo_driver.timer import log_slow_event
+from mongo_driver import SlaveOkSetting
 
 
 class ReadMixin(BaseMixin):
@@ -91,7 +91,7 @@ class ReadMixin(BaseMixin):
             total += 1
             results.append(cls._from_son(doc))
             if total == cls.FIND_WARNING_DOCS_LIMIT + 1:
-                logging.getLogger('iu_mongo.read.find_warning').warn(
+                logging.getLogger('mongo_driver.read.find_warning').warn(
                     'Collection %s: return more than %d docs in one FIND action, '
                     'consider to use FIND_ITER.',
                     cls.__name__,

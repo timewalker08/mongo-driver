@@ -6,8 +6,8 @@ import time
 from pymongo.write_concern import WriteConcern
 from pymongo.errors import ConnectionFailure
 from tests.model.testdoc import TestDoc
-from iu_mongo.connection import connect, clear_all
-from iu_mongo import SlaveOkSetting
+from mongo_driver.connection import connect, clear_all
+from mongo_driver import SlaveOkSetting
 
 
 class ReadTests(unittest.TestCase):

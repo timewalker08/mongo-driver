@@ -3,11 +3,11 @@ import pymongo
 import warnings
 from pymongo.write_concern import WriteConcern
 from bson import SON, ObjectId
-from iu_mongo.errors import OperationError
-from iu_mongo.mixin.base import BaseMixin
-from iu_mongo.mixin.bulk_mixin import BulkMixin
-from iu_mongo.timer import log_slow_event
-from iu_mongo.session import Session
+from mongo_driver.errors import OperationError
+from mongo_driver.mixin.base import BaseMixin
+from mongo_driver.mixin.bulk_mixin import BulkMixin
+from mongo_driver.timer import log_slow_event
+from mongo_driver.session import Session
 
 
 class WriteMixin(BulkMixin, BaseMixin):

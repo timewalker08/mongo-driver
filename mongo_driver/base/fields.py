@@ -6,11 +6,11 @@ import pymongo
 import six
 from six import iteritems
 
-from iu_mongo.base.common import UPDATE_OPERATORS
-from iu_mongo.base.datastructures import (BaseDict, BaseList,
+from mongo_driver.base.common import UPDATE_OPERATORS
+from mongo_driver.base.datastructures import (BaseDict, BaseList,
                                           EmbeddedDocumentList)
-from iu_mongo.common import _import_class
-from iu_mongo.errors import ValidationError
+from mongo_driver.common import _import_class
+from mongo_driver.errors import ValidationError
 
 
 __all__ = ('BaseField', 'ComplexBaseField', 'ObjectIdField')

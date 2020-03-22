@@ -2,7 +2,7 @@ from pymongo.read_concern import ReadConcern
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
 from pymongo.errors import InvalidOperation
-from iu_mongo.errors import TransactionError
+from mongo_driver.errors import TransactionError
 
 __all__ = ['Session', 'TransactionContext']
 

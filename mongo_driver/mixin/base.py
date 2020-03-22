@@ -5,19 +5,19 @@ from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
 from pymongo.collection import Collection
 from bson import SON, DBRef, ObjectId
-from iu_mongo.base import BaseDocument, get_document
-from iu_mongo.errors import ValidationError
-from iu_mongo.timer import log_slow_event
-from iu_mongo.connection import ConnectionError, get_connection
-from iu_mongo.session import Session
-from iu_mongo import SlaveOkSetting
-from iu_mongo.utils.terminal import color_terminal, Color
+from mongo_driver.base import BaseDocument, get_document
+from mongo_driver.errors import ValidationError
+from mongo_driver.timer import log_slow_event
+from mongo_driver.connection import ConnectionError, get_connection
+from mongo_driver.session import Session
+from mongo_driver import SlaveOkSetting
+from mongo_driver.utils.terminal import color_terminal, Color
 
 RETRY_ERRORS = (
     pymongo.errors.ConnectionFailure,
     ConnectionError
 )
-RETRY_LOGGER = logging.getLogger('iu_mongo.pymongo_retry')
+RETRY_LOGGER = logging.getLogger('mongo_driver.pymongo_retry')
 
 
 class BaseMixin(object):
@@ -26,7 +26,7 @@ class BaseMixin(object):
         if (not (max_time_ms > 0 and max_time_ms < 10000)) and \
             (read_preference == ReadPreference.PRIMARY or
                 read_preference == ReadPreference.PRIMARY_PREFERRED):
-            logger = logging.getLogger('iu_mongo.document.max_time_ms')
+            logger = logging.getLogger('mongo_driver.document.max_time_ms')
             logger.warn(
                 'Collection %s: no timeout or large timeout for %s operation on primary node',
                 cls.__name__, action_name)
@@ -47,7 +47,7 @@ class BaseMixin(object):
 
     @classmethod
     def _pymongo(cls, create=False, slave_ok_setting=None):
-        from iu_mongo.connection import get_db
+        from mongo_driver.connection import get_db
         database = None
         collection = None
         database = get_db(cls._meta['db_name'])
@@ -86,7 +86,7 @@ class BaseMixin(object):
 
     @classmethod
     def _transform_value(cls, value):
-        from iu_mongo import EmbeddedDocument
+        from mongo_driver import EmbeddedDocument
         if isinstance(value, EmbeddedDocument):
             return value.to_mongo()
         elif isinstance(value, dict):
@@ -105,7 +105,7 @@ class BaseMixin(object):
 
     @classmethod
     def list_indexes(cls, display=True):
-        from iu_mongo import TaggedIndex, IndexDefinition
+        from mongo_driver import TaggedIndex, IndexDefinition
         from copy import copy
         desired_indexes = set([])
         for index_def in cls._meta['indexes']:

@@ -1,8 +1,8 @@
-from iu_mongo.base.common import *
-from iu_mongo.base.datastructures import *
-from iu_mongo.base.document import *
-from iu_mongo.base.fields import *
-from iu_mongo.base.metaclasses import *
+from mongo_driver.base.common import *
+from mongo_driver.base.datastructures import *
+from mongo_driver.base.document import *
+from mongo_driver.base.fields import *
+from mongo_driver.base.metaclasses import *
 
 __all__ = (
     # common

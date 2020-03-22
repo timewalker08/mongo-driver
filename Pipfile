@@ -12,7 +12,7 @@ iu-mongo = {editable = true,path = "."}
 [scripts]
 test_all = "python -Wd -m unittest -v tests"
 test_single = "python -Wd -m unittest -v"
-dbshell = "python -Wd -m iu_mongo.utils.dbshell"
+dbshell = "python -Wd -m mongo_driver.utils.dbshell"
 
 [dev-packages]
 autopep8 = "*"

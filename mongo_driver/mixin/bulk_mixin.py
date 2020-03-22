@@ -2,10 +2,10 @@ import contextlib
 import pymongo
 import warnings
 from bson import ObjectId
-from iu_mongo.errors import BulkOperationError
+from mongo_driver.errors import BulkOperationError
 from pymongo.write_concern import WriteConcern
 from pymongo.operations import UpdateMany, UpdateOne, DeleteMany, DeleteOne, InsertOne
-from iu_mongo.mixin.base import BaseMixin
+from mongo_driver.mixin.base import BaseMixin
 
 
 class BulkContext(object):

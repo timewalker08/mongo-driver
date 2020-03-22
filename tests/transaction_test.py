@@ -1,11 +1,11 @@
 import unittest
 import pymongo
-import iu_mongo
-from iu_mongo import Document, connect, clear_all
-from iu_mongo.fields import *
-from iu_mongo.session import DEFAULT_READ_CONCERN, DEFAULT_READ_PREFERENCE, DEFAULT_WRITE_CONCERN
-from iu_mongo.errors import TransactionError
-from iu_mongo.slave_ok_setting import SlaveOkSetting
+import mongo_driver
+from mongo_driver import Document, connect, clear_all
+from mongo_driver.fields import *
+from mongo_driver.session import DEFAULT_READ_CONCERN, DEFAULT_READ_PREFERENCE, DEFAULT_WRITE_CONCERN
+from mongo_driver.errors import TransactionError
+from mongo_driver.slave_ok_setting import SlaveOkSetting
 
 
 class Doc(Document):
@@ -50,11 +50,11 @@ class TransactionTests(unittest.TestCase):
             transaction_context._transaction.opts.read_preference, DEFAULT_READ_PREFERENCE)
         doc = DocTest(test_int=1)
         with connection.start_session() as session:
-            self.assertRaises(iu_mongo.errors.OperationError, doc.save)
-            self.assertRaises(iu_mongo.errors.OperationError,
+            self.assertRaises(mongo_driver.errors.OperationError, doc.save)
+            self.assertRaises(mongo_driver.errors.OperationError,
                               doc.save, session=session)
             with session.start_transaction():
-                self.assertRaises(iu_mongo.errors.OperationError, doc.save)
+                self.assertRaises(mongo_driver.errors.OperationError, doc.save)
                 DocTest.remove({}, session=session)
                 doc.save(session=session)
                 self.assertEqual(DocTest.count({}, session=session), 1)

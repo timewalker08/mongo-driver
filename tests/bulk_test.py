@@ -1,6 +1,6 @@
 import unittest
 from tests.model.testdoc import TestDoc
-from iu_mongo.connection import connect, clear_all
+from mongo_driver.connection import connect, clear_all
 
 
 class BulkTests(unittest.TestCase):

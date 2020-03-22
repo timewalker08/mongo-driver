@@ -4,11 +4,11 @@ import pymongo
 import six
 from six import iteritems
 
-from iu_mongo.base import (BaseDocument,
+from mongo_driver.base import (BaseDocument,
                            DocumentMetaclass, EmbeddedDocumentList,
                            TopLevelDocumentMetaclass)
-from iu_mongo.mixin.read_mixin import ReadMixin
-from iu_mongo.mixin.write_mixin import WriteMixin
+from mongo_driver.mixin.read_mixin import ReadMixin
+from mongo_driver.mixin.write_mixin import WriteMixin
 
 __all__ = ('Document', 'EmbeddedDocument')
 

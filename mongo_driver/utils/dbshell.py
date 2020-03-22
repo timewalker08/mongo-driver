@@ -1,6 +1,6 @@
 from IPython.terminal.embed import InteractiveShellEmbed
-from iu_mongo import connect, clear_all, get_admin_db
-from iu_mongo.base import BaseDocument, TopLevelDocumentMetaclass, DocumentMetaclass
+from mongo_driver import connect, clear_all, get_admin_db
+from mongo_driver.base import BaseDocument, TopLevelDocumentMetaclass, DocumentMetaclass
 import pprint
 import argparse
 from math import ceil
@@ -54,7 +54,7 @@ class DBShell(object):
         ipshell = InteractiveShellEmbed(
             banner1="\033[95mWelcome to the DBShell!\033[0m",
             banner2="\033[95mThis is an interactive shell to manipulate your "
-            "documents through iu_mongo driver\033[0m"
+            "documents through mongo_driver driver\033[0m"
         )
         connection = self._connect
         h = self._help

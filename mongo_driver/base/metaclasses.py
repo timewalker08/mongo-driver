@@ -3,10 +3,10 @@ import warnings
 import six
 from six import iteritems, itervalues
 
-from iu_mongo.base.common import _document_registry
-from iu_mongo.base.fields import BaseField, ComplexBaseField, ObjectIdField
-from iu_mongo.common import _import_class
-from iu_mongo.errors import InvalidDocumentError, DoesNotExist, MultipleObjectsReturned
+from mongo_driver.base.common import _document_registry
+from mongo_driver.base.fields import BaseField, ComplexBaseField, ObjectIdField
+from mongo_driver.common import _import_class
+from mongo_driver.errors import InvalidDocumentError, DoesNotExist, MultipleObjectsReturned
 
 
 __all__ = ('DocumentMetaclass', 'TopLevelDocumentMetaclass')

@@ -2,10 +2,10 @@ import unittest
 import pymongo
 import datetime
 from bson import ObjectId
-from iu_mongo import Document, connect
-from iu_mongo.fields import *
-from iu_mongo.errors import ValidationError
-import iu_mongo
+from mongo_driver import Document, connect
+from mongo_driver.fields import *
+from mongo_driver.errors import ValidationError
+import mongo_driver
 
 
 class Person(Document):
@@ -79,8 +79,8 @@ class FieldTests(unittest.TestCase):
         doc2 = Doc.find_one({'test_int': {'$ne': None}})
         self.assertEqual(doc1.test_int, None)
         self.assertEqual(doc2.test_int, max_int_val)
-        self.assertRaises(iu_mongo.errors.ValidationError, doc3.save)
-        self.assertRaises(iu_mongo.errors.ValidationError, doc4.save)
+        self.assertRaises(mongo_driver.errors.ValidationError, doc3.save)
+        self.assertRaises(mongo_driver.errors.ValidationError, doc4.save)
 
         doc5 = Doc(test_int='-123')
         doc5.save()

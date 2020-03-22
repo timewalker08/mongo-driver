@@ -12,21 +12,21 @@ def _import_class(cls_name):
 
     # Field Classes
     if not _field_list_cache:
-        from iu_mongo.fields import __all__ as fields
+        from mongo_driver.fields import __all__ as fields
         _field_list_cache.extend(fields)
-        from iu_mongo.base.fields import __all__ as fields
+        from mongo_driver.base.fields import __all__ as fields
         _field_list_cache.extend(fields)
 
     field_classes = _field_list_cache
 
     if cls_name == 'BaseDocument':
-        from iu_mongo.base import document as module
+        from mongo_driver.base import document as module
         import_classes = ['BaseDocument']
     elif cls_name in doc_classes:
-        from iu_mongo import document as module
+        from mongo_driver import document as module
         import_classes = doc_classes
     elif cls_name in field_classes:
-        from iu_mongo import fields as module
+        from mongo_driver import fields as module
         import_classes = field_classes
     else:
         raise ValueError('No import set for: ' % cls_name)

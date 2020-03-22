@@ -25,12 +25,12 @@ except ImportError:
     Int64 = long
 
 
-from iu_mongo.base import (BaseDocument, BaseField, ComplexBaseField, ObjectIdField,
+from mongo_driver.base import (BaseDocument, BaseField, ComplexBaseField, ObjectIdField,
                            get_document)
-from iu_mongo.base.utils import LazyRegexCompiler
-from iu_mongo.common import _import_class
-from iu_mongo.document import Document, EmbeddedDocument
-from iu_mongo.errors import InvalidQueryError, ValidationError
+from mongo_driver.base.utils import LazyRegexCompiler
+from mongo_driver.common import _import_class
+from mongo_driver.document import Document, EmbeddedDocument
+from mongo_driver.errors import InvalidQueryError, ValidationError
 
 
 if six.PY3:

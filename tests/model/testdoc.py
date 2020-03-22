@@ -1,6 +1,6 @@
-from iu_mongo.document import Document, EmbeddedDocument
-from iu_mongo.fields import *
-from iu_mongo.index import IndexDefinition
+from mongo_driver.document import Document, EmbeddedDocument
+from mongo_driver.fields import *
+from mongo_driver.index import IndexDefinition
 from datetime import datetime
 
 

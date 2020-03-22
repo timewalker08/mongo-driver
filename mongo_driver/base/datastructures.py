@@ -4,8 +4,8 @@ from bson import DBRef
 import six
 from six import iteritems
 
-from iu_mongo.common import _import_class
-from iu_mongo.errors import DoesNotExist, MultipleObjectsReturned
+from mongo_driver.common import _import_class
+from mongo_driver.errors import DoesNotExist, MultipleObjectsReturned
 
 __all__ = ('BaseDict', 'StrictDict', 'BaseList', 'EmbeddedDocumentList')
 

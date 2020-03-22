@@ -1,8 +1,8 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.read_preferences import ReadPreference
 from pymongo.read_concern import ReadConcern
-from iu_mongo.errors import ConnectionError
-from iu_mongo.session import Session
+from mongo_driver.errors import ConnectionError
+from mongo_driver.session import Session
 import collections
 
 __all__ = ['connect', 'get_db', 'get_connection', 'clear_all', 'get_admin_db',

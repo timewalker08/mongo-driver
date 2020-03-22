@@ -1,10 +1,10 @@
 import unittest
 import pymongo
 from bson import ObjectId
-from iu_mongo.errors import OperationError
+from mongo_driver.errors import OperationError
 from tests.model.testdoc import *
-from iu_mongo.connection import connect, clear_all
-from iu_mongo.errors import ConnectionError
+from mongo_driver.connection import connect, clear_all
+from mongo_driver.errors import ConnectionError
 
 
 class WriteTests(unittest.TestCase):

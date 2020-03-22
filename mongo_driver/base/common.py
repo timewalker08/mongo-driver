@@ -1,4 +1,4 @@
-from iu_mongo.errors import NotRegistered
+from mongo_driver.errors import NotRegistered
 
 __all__ = ('UPDATE_OPERATORS', 'get_document', '_document_registry')
 

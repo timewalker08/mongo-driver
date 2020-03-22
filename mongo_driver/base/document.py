@@ -7,13 +7,13 @@ import pymongo
 import six
 from six import iteritems
 
-from iu_mongo.base.common import get_document
-from iu_mongo.base.datastructures import (BaseDict, BaseList,
+from mongo_driver.base.common import get_document
+from mongo_driver.base.datastructures import (BaseDict, BaseList,
                                           EmbeddedDocumentList,
                                           StrictDict)
-from iu_mongo.base.fields import ComplexBaseField
-from iu_mongo.common import _import_class
-from iu_mongo.errors import (FieldDoesNotExist, InvalidDocumentError,
+from mongo_driver.base.fields import ComplexBaseField
+from mongo_driver.common import _import_class
+from mongo_driver.errors import (FieldDoesNotExist, InvalidDocumentError,
                              LookUpError, OperationError, ValidationError)
 
 __all__ = ('BaseDocument', 'NON_FIELD_ERRORS')

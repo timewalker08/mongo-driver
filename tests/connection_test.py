@@ -1,11 +1,11 @@
 import unittest
 import pymongo
 import mongomock
-from iu_mongo.connection import connect, get_db, get_connection, clear_all, \
+from mongo_driver.connection import connect, get_db, get_connection, clear_all, \
     get_admin_db, DEFAULT_WRITE_CONCERN, DEFAULT_WTIMEOUT, DEFAULT_READ_CONCERN_LEVEL
-from iu_mongo import Document
-from iu_mongo.fields import IntField
-from iu_mongo.errors import OperationError
+from mongo_driver import Document
+from mongo_driver.fields import IntField
+from mongo_driver.errors import OperationError
 
 
 class ConnectionTests(unittest.TestCase):
